@@ -1,0 +1,90 @@
+@font-face {
+  font-family: "pixel";
+  src: url("./fonts/000webfont.ttf") format("truetype");
+}
+/*
+
+body{
+    position : absolute;
+    width : 100%;
+    min-height : 100vh;
+    margin : 0px;
+}
+
+*/
+body {
+  margin: 0px;
+  color: #58595B;
+}
+
+header {
+  background-color: #EAEAEA;
+  color: #FF922A;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 50px;
+}
+header h1 {
+  margin: 0px;
+  font-family: pixel;
+}
+
+.public {
+  background-color: #EAEAEA;
+  width: 90%;
+  min-height: 100px;
+  margin: auto;
+  margin-top: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.public h2 {
+  margin: 0px;
+  margin-top: 3px;
+  font-family: pixel;
+}
+
+section {
+  background: #EAEAEA;
+  margin: auto;
+  margin-top: 20px;
+  width: 90%;
+  min-height: 400px;
+  display: flex;
+  justify-content: space-around;
+  align-items: stretch;
+}
+
+.nav {
+  background: #EAEAEA;
+  width: 20%;
+  margin-top: 10px;
+  margin-bottom: 10px;
+}
+
+.main {
+  background-color: white;
+  width: 50%;
+  margin-top: 10px;
+  margin-bottom: 10px;
+}
+
+.summary {
+  background: #EAEAEA;
+  width: 20%;
+  margin-top: 10px;
+  margin-bottom: 10px;
+}
+
+footer {
+  background: #EAEAEA;
+  width: 100%;
+  position: absolute;
+  bottom: 0px;
+  margin-top: 20px;
+}
+
+/*# sourceMappingURL=style.css.map */

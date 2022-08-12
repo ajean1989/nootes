@@ -1,0 +1,43 @@
+section{
+    background: $background-color;
+
+    margin: auto;
+    margin-top: 20px;
+    width : 90%;
+    min-height : 400px;
+
+
+    display : flex;
+    justify-content: space-around;
+    align-items: stretch;
+
+}
+
+.nav{
+    background: $background-color;
+    width: 20%;
+
+    margin-top: 10px;
+    margin-bottom : 10px;
+
+
+}
+
+.main{
+    background-color: white;
+    width: 50%;
+
+    margin-top: 10px;
+    margin-bottom : 10px;
+
+
+}
+
+.summary{
+    background: $background-color;
+    width: 20%;
+
+    margin-top: 10px;
+    margin-bottom : 10px;
+
+}
