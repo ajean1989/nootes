@@ -18,5 +18,14 @@
     font-family: pixel;
     }
 
+    &__content{
+        align-self: start;
+        
+        & ul{
+            list-style-type : none;
+        }
+
+    }
+
 
 }

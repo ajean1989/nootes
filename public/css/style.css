@@ -46,6 +46,12 @@ header h1 {
   margin-top: 3px;
   font-family: pixel;
 }
+.public__content {
+  align-self: start;
+}
+.public__content ul {
+  list-style-type: none;
+}
 
 section {
   background: #EAEAEA;

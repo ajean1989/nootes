@@ -49,7 +49,7 @@
 
 		</footer>
 
-        <script src="./js/public.js"></script>
+        <script type="module" src="./js/index.js"></script>
 
 
 	</body>
