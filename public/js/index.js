@@ -1,7 +1,6 @@
-//import { publicLeftView, publicFetch } from './public.js';
-import { Public } from './class/public.js';
+import { PublicData } from './class/public/PublicData.js';
 
-let publicView = new Public;
+export let Public = new PublicData;
 
-publicView.publicLeftView();
+Public.publicStep1();
 

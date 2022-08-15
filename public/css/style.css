@@ -47,10 +47,19 @@ header h1 {
   font-family: pixel;
 }
 .public__content {
-  align-self: start;
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
 }
 .public__content ul {
   list-style-type: none;
+}
+.public__content__left h3 {
+  margin: 0px;
+  cursor: pointer;
+}
+.public__content__left ul li {
+  cursor: pointer;
 }
 
 section {

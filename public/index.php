@@ -26,8 +26,12 @@ if(preg_match($regex,$uri))
 {
     switch($uri)
     {
-        case '/fetch/public/users':
-            require_once $controlsDirectory . 'public'. DIRECTORY_SEPARATOR .'users.php';
+        case '/fetch/public/outside':
+            require_once $controlsDirectory . 'public'. DIRECTORY_SEPARATOR .'outside.php';
+            break;
+
+        case '/fetch/public/inside':
+            require_once $controlsDirectory . 'public'. DIRECTORY_SEPARATOR .'inside.php';
             break;
 
 

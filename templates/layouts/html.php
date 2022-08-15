@@ -17,11 +17,23 @@
 		</header>
 
         <div class="public">
+
             <h2>Notes publics</h2>
+
             <div class="public__content">
 
-            </div>
+                <div class="public__content__left">
+                    <h3></h3>
+                    <ul></ul>
+                </div>
 
+                <div class="public__content__middle">
+                </div>
+
+                <div class="public__content__right">
+                </div>
+
+            </div>
 
         </div>
 

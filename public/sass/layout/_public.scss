@@ -19,10 +19,24 @@
     }
 
     &__content{
-        align-self: start;
-        
+        width : 100%;
+        display : flex;
+        justify-content: space-between;
+
         & ul{
             list-style-type : none;
+            
+        }
+
+        &__left{
+            & h3{
+            margin : 0px;
+            cursor: pointer;
+            }
+
+            & ul li{
+                cursor: pointer;
+            }
         }
 
     }
