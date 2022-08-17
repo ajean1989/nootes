@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 Class Page extends Note{
 
-    public $page_id;
-    public $page_name;
+    public int $page_id;
+    public string $page_name;
 
 }

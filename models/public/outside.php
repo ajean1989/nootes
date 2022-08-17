@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 Db::Connexion();
 
-$query = 'SELECT user.user_id, user.username, note.note_id, note.note_name, note.share FROM user INNER JOIN note ON user.user_id = note.user_id WHERE note.share = 1';
+$query = 'SELECT user.user_id, user.username, user.mail, note.note_id, note.note_name, note.share, page.page_id, page.page_name FROM user INNER JOIN note ON user.user_id = note.user_id INNER JOIN page ON note.note_id = page.note_id WHERE note.share = 1';
 
 //Voir si on peut suppr note.share dans $query
 

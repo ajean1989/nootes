@@ -16,21 +16,22 @@
             <h1>nootes</h1>
 		</header>
 
-        <div class="public">
+        <div class="Public">
 
-            <h2>Notes publics</h2>
+            <h2>Notes Publics</h2>
 
-            <div class="public__content">
+            <div class="Public__content">
 
-                <div class="public__content__left">
+                <div class="Public__content__left">
                     <h3></h3>
+                    <h4></h4>
                     <ul></ul>
                 </div>
 
-                <div class="public__content__middle">
+                <div class="Public__content__middle">
                 </div>
 
-                <div class="public__content__right">
+                <div class="Public__content__right">
                 </div>
 
             </div>
@@ -39,17 +40,17 @@
 
 		<section>
 
-            <div class="nav">
-
+            <div class="Private__content__left">
+                <h3></h3>
+                <h4></h4>
+                <ul></ul>
             </div>
 
-			<div class="main">
-
+			<div class="Private__content__middle">
         	
-
 			</div>
 
-            <div class="summary">
+            <div class="Private__content__right">
                 
             </div>
 

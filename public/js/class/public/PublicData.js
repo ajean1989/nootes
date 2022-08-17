@@ -1,10 +1,10 @@
 import { Fetch } from '../fetch.js';
-import { PublicView } from './PublicView.js';
+import { View } from '../contentView.js';
 
 
 export class PublicData{
 
-    constructor(user_id, username, note_id, note_name, share, view, publicInside){
+    constructor(user_id, username, note_id, note_name, share, view, publicInside, outsideContent, insideContent){
         this.user_id = user_id;
         this.username = username;
         this.note_id = note_id;
@@ -12,6 +12,8 @@ export class PublicData{
         this.share = share;
         this.view = view;
         this.publicInside = publicInside;
+        this.outsideContent = outsideContent
+        this.insideContent = insideContent
     }
 
     // outsideContent = contenu qui s'initialise lors du chargement principal de la page (username - note)
@@ -21,11 +23,15 @@ export class PublicData{
 
         // Fetch
 
-        let outsideContent = await Fetch.jsonFetchGET('public/outside');
-        // outsideContent = [{user, note}]
+        let outsideContent = await Fetch.jsonFetchGET('Public/outside');
+        // outsideContent = [{user, note}] WHERE share=1
+        this.outsideContent = outsideContent,
 
-        this.view = new PublicView;
-        this.view.leftView(outsideContent);
+        // OPTIMISATION : Charger outsideContent dans une propriété et l'utiliser pour chaque potentiel futur appel
+
+        //this.view = new View;
+        //this.view.outsideView(outsideContent, 'Public');
+        View.outsideView(outsideContent, 'Public');
     }
 
 
@@ -38,10 +44,14 @@ export class PublicData{
 
         let fetchOptions = {method : 'POST',headers:{'Content-Type':'application.json;charset=utf-8','Accept':'application/json'},body: JSON.stringify(this.note_id)}
 
-        let insideContent = await Fetch.jsonFetchPOST('public/inside', fetchOptions); 
+        let insideContent = await Fetch.jsonFetchPOST('Public/inside', fetchOptions); 
         // [{note_id(fixe), page_id, page_name, position, type, content}]
+        this.insideContent = insideContent;
 
-        this.view.leftView(insideContent)
+        // OPTIMISATION : Charger insideContent dans une propriété et l'utiliser pour chaque potentiel futur appel
+
+        //this.view.insideView(insideContent, 'public')
+        View.insideView(insideContent, 'Public');
     }
 }
 

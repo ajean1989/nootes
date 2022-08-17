@@ -2,11 +2,15 @@
 
 declare(strict_types=1);
 
-Class User{
+Class User extends CRUDUser{
 
-    public $user_id;
-    public $mail;
-    public $username;
-    public $password;
+    public int $user_id;
+    public string $mail;
+    public string $username;
+    public string $password;
+    public int $admin;
+
     
+
+
 }

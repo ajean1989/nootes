@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 Class Content extends Page{
 
-    public $content_id;
-    public $position;
-    public $type;
-    public $content;
+    public int $content_id;
+    public int $position;
+    public string $type;
+    public string $content;
     
 }

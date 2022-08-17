@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 Class Note extends User{
 
-    public $note_id;
-    public $note_name;
-    public $share;
+    public int $note_id;
+    public string $note_name;
+    public int $share;
     
 }

@@ -31,7 +31,7 @@ header h1 {
   font-family: pixel;
 }
 
-.public {
+.Public {
   background-color: #EAEAEA;
   width: 90%;
   min-height: 100px;
@@ -41,24 +41,24 @@ header h1 {
   flex-direction: column;
   align-items: center;
 }
-.public h2 {
+.Public h2 {
   margin: 0px;
   margin-top: 3px;
   font-family: pixel;
 }
-.public__content {
+.Public__content {
   width: 100%;
   display: flex;
   justify-content: space-between;
 }
-.public__content ul {
+.Public__content ul {
   list-style-type: none;
 }
-.public__content__left h3 {
+.Public__content__left h3 {
   margin: 0px;
   cursor: pointer;
 }
-.public__content__left ul li {
+.Public__content__left ul li {
   cursor: pointer;
 }
 
@@ -73,21 +73,21 @@ section {
   align-items: stretch;
 }
 
-.nav {
+.Private__content__left {
   background: #EAEAEA;
   width: 20%;
   margin-top: 10px;
   margin-bottom: 10px;
 }
 
-.main {
+.Private__content__middle {
   background-color: white;
   width: 50%;
   margin-top: 10px;
   margin-bottom: 10px;
 }
 
-.summary {
+.Private__content__right {
   background: #EAEAEA;
   width: 20%;
   margin-top: 10px;
