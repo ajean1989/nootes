@@ -173,6 +173,7 @@ export class View{
 
 
 
+    // Affiche le bouton de déconnexion et le bouton de profil dans le header
 
     static connnexionConfig(){
         let header = document.querySelector('header');
@@ -225,6 +226,7 @@ export class View{
         let lefth3Selector = document.querySelector(`.${zone}__content__left h3`);
         let lefth4Selector = document.querySelector(`.${zone}__content__left h4`);
         let leftUlSelector = document.querySelector(`.${zone}__content__left ul`);
+        let middleSelector = document.querySelector(`.${zone}__content__middle`);
         let rightSelector = document.querySelector(`.${zone}__content__right`);
 
         // h3 + onclick
@@ -232,7 +234,10 @@ export class View{
         if(zone === 'Private')
         {
             lefth3Selector.textContent = Private.username;
-            lefth3Selector.addEventListener('click', (e) => {e.preventDefault, this.outsideView(zone.outsideContent);})
+            lefth3Selector.addEventListener('click', (e) => {
+                e.preventDefault;
+                lefth4Selector.textContent = '';
+                this.outsideView(outside, zone);})
         }
 
 
@@ -242,25 +247,60 @@ export class View{
             leftUlSelector.removeChild(leftUlSelector.firstChild);
         }
 
+        while (middleSelector.firstChild) {
+            middleSelector.removeChild(middleSelector.firstChild);
+        }
+        middleSelector.textContent = 'Sélectionnez une note';
+
+        while (rightSelector.firstChild) {
+            rightSelector.removeChild(rightSelector.firstChild);
+        }
+     
+
         let firstClick = (oneNote, zone) => {
 
-        // On efface ce qui pré-éxistait
+            // On efface ce qui pré-éxistait
 
             while (leftUlSelector.firstChild) {
                 leftUlSelector.removeChild(leftUlSelector.firstChild);
             }
 
+            while (middleSelector.firstChild) {
+                middleSelector.removeChild(middleSelector.firstChild);
+            }
+            middleSelector.textContent = 'Sélectionnez une page';
+
+         
+
             // h4 + onclick
 
-            lefth4Selector.textContent = oneNote.note_name;
-            lefth4Selector.addEventListener('click', (e) => {e.preventDefault; this.outsideView(zone.outsideContent, zone);})
-            
-  
+            if(zone === 'Public'){ 
+                //Sélectionne par note_name dans Public où tous les outsides sont mélangé entre user
+                let oldOutside; 
+                oldOutside = outside;
+                outside = outside.filter((outside) => outside.note_name === oneNote.note_name)
+
+                lefth4Selector.textContent = oneNote.note_name;
+                lefth4Selector.addEventListener('click', (e) => {
+                e.preventDefault; 
+                lefth4Selector.textContent = '';
+                this.outsideView(oldOutside, zone);})
+            }
+            else{
+                lefth4Selector.textContent = oneNote.note_name;
+                lefth4Selector.addEventListener('click', (e) => {
+                e.preventDefault; 
+                lefth4Selector.textContent = '';
+                this.outsideView(outside, zone);})
+            }
+
+
+
 
             //Affiche les pages
 
             let notes_length = 0;
-            console.log(outside);
+     
 
             for(let i in outside)
             {
@@ -297,10 +337,12 @@ export class View{
             {
                 if(existLi.indexOf(outside[i].note_name) === -1){  
                     //si note_name n'est pas dans le tableau existLi
+
                     let leftLi = document.createElement('li');
                     leftLi.id = `${zone}__noteName__` + [i];
                     leftLi.textContent = outside[i].note_name;
                     leftUlSelector.appendChild(leftLi);
+
                     existLi.push(leftLi.textContent); 
                     outside_length++;
                 }
@@ -312,6 +354,7 @@ export class View{
                         leftLi.id = `${zone}__noteName__` + [i];
                         leftLi.textContent = outside[i].note_name + ' (' + outside[i].username + ')';
                         leftUlSelector.appendChild(leftLi);
+
                         existLi.push(leftLi.textContent); 
                         outside_length++;
                     }        
@@ -354,6 +397,8 @@ export class View{
 
         this.summary(zone);
     }
+
+
     
 
 
