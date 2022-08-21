@@ -1,5 +1,6 @@
 import { Fetch } from './fetch.js';
 import { Private } from '../index.js';
+import { ElementView } from './elementView.js';
 
 
 export class View{
@@ -374,11 +375,9 @@ export class View{
 
 
 
-
     static insideView(insideContent,zone){
         // Charge contenu = f(page)
 
-        console.log(insideContent);
 
         let middleSelector = document.querySelector(`.${zone}__content__middle`);
 
@@ -386,17 +385,168 @@ export class View{
             middleSelector.removeChild(middleSelector.firstChild);
         }
  
-        for(let j=1; j<=insideContent.length; j++)    //Recherhce la position 1, l'affiche
+        // Charge la page et tous ses évenements
+        
+        for(let j=1; j<=insideContent.length; j = j+2)    //Recherhce la position 1, l'affiche
         {                                               //Position 2, l'affiche  ... 
             if(insideContent[j-1].position === j)
             {
-                let k = j-1;
-                middleSelector.innerHTML += '<' + insideContent[j-1].type + ' id="' + k + '">' + insideContent[j-1].content + '</' + insideContent[j-1].type + '>';
-            }
-        }
 
+                // Affiche chaque objet insideContent div:id-div:id->div:type->div:pos
+
+                let k = j-1;
+                middleSelector.innerHTML += '<div id="li_' + k +'"></div><div id="li_' + j + '"><div class="move"></div><div id="pos_' + j +'"><' + insideContent[j-1].type + ' id="content_' + j + '">' + insideContent[j-1].content + '</' + insideContent[j-1].type + '></div></div>';
+
+
+
+                // Event : Affiche le formulaire de modification du content au dblclic
+
+                let liPositionId = document.getElementById('li_' + j);
+                let posId = document.getElementById('pos_' + j);
+             
+
+                posId.addEventListener('dblclick',()=>{
+                    let form = document.createElement('form'); 
+                    form.className = 'modifyForm'
+                    form.action = '';
+
+                    let textarea = document.createElement('textarea');
+                    textarea.className='modifyForm--textarea'
+                    textarea.name = 'content';
+                    textarea.textContent = insideContent[k].content;
+
+                    form.appendChild(textarea);
+                   
+                    let typeSelect = document.createElement('select');
+                    typeSelect.name = 'type';
+    
+                    let typeOption =[];
+    
+                    typeOption[0] = document.createElement('option');
+                    typeOption[0].value = 'h1';
+                    typeOption[0].textContent = 'Titre1';
+    
+                    typeOption[1] = document.createElement('option');
+                    typeOption[1].value = 'h2';
+                    typeOption[1].textContent = 'Titre2';
+    
+                    typeOption[2] = document.createElement('option');
+                    typeOption[2].value = 'h3';
+                    typeOption[2].textContent = 'Titre3';
+    
+                    typeOption[3] = document.createElement('option');
+                    typeOption[3].value = 'h4';
+                    typeOption[3].textContent = 'Titre4';
+    
+                    typeOption[4] = document.createElement('option');
+                    typeOption[4].value = 'h5';
+                    typeOption[4].textContent = 'Titre5';
+    
+                    typeOption[5] = document.createElement('option');
+                    typeOption[5].value = 'p';
+                    typeOption[5].textContent = 'Paragraphe';
+
+                    typeOption[6] = document.createElement('option');
+                    typeOption[6].value = '<pre><code>';
+                    typeOption[6].textContent = 'code';
+    
+    
+                    for(let l=0; l<7; l++){
+                        typeSelect.appendChild(typeOption[l]);
+                        if(insideContent[j-1].type === typeOption[l].value){
+                            typeOption[l].setAttribute('selected', "");
+                        }
+                    }
+
+                        form.appendChild(typeSelect);
+             
+
+                        posId = liPositionId.replaceChild(form, posId);
+
+                        let modifyFormSelect = document.querySelector(".modifyForm");
+                        let textareaFormSelect = document.querySelector(".modifyForm--textarea");
+
+                        textareaFormSelect.focus();
+             
+                    // Event : Enregistre les modifs when press enter
+
+                    modifyFormSelect.addEventListener('keyup', (e) => {
+                        if(e.keyCode == 13) { // KeyCode de la touche entrée
+                            if (e.shiftKey == false){
+                                
+                                let returnObject = {}
+                            
+                            console.log('press : Private.insideContent');
+                            console.log(Private.insideContent);
+                            console.log('press : Private');
+                            console.log(Private);
+                            console.log('press : this');
+                            console.log(this);
+                            console.log('------------');
+
+                                let newData = new FormData(modifyFormSelect);
+                                for(var pair of newData.entries()) {
+                                    returnObject[pair[0]] = pair[1];
+                                }
+                                console.log('returnObject : ');
+                                console.log(returnObject);
+                                console.log('content_id : ');
+                                console.log(insideContent[j-1].content_id)
+                                console.log('---------');
+                                Private.modification(returnObject, insideContent[j-1].content_id);       // Ne retourn pas à fonction d'origine 
+                            }
+                        }
+                    });
+
+                });
+            }
+
+            // Ajout bouton + 
+            middleSelector.innerHTML += '<button id="addContent">+</button>';
+            let addContentSelect = document.getElementById('addContent');
+            
+
+            addContentSelect.addEventListener('click',()=>{
+                ElementView.form();
+
+                let addFormSelect = document.querySelector('.modifyForm--textarea'); 
+                
+
+                addFormSelect.addEventListener('keyup', (e) => {
+                    e.preventDefault();
+                    if(e.key === 'Enter'){ // KeyCode de la touche entrée
+                        if (e.shiftKey == false){
+                            
+                            let returnObject = {}
+                        
+                        console.log('press : Private.insideContent');
+                        console.log(Private.insideContent);
+                        console.log('press : Private');
+                        console.log(Private);
+                        console.log('press : this');
+                        console.log(this);
+                        console.log('------------');
+
+                            let newData = new FormData(form);
+                            for(var pair of newData.entries()) {
+                                returnObject[pair[0]] = pair[1];
+                            }
+                            console.log('returnObject : ');
+                            console.log(returnObject);
+                            console.log('content_id : ');
+                            console.log(insideContent[j-1].content_id)
+                            console.log('---------');
+                            Private.addContent(returnObject);       // Ne retourn pas à fonction d'origine 
+                        }
+                    }
+                })
+            })
+        }
+        
         this.summary(zone);
     }
+
+
 
 
     
@@ -406,17 +556,34 @@ export class View{
 
         let titres=[];  //Tableau récupération des titres
 
-        let nb=document.querySelectorAll(`.${zone}__content__middle h1, .${zone}__content__middle h2, .${zone}__content__middle h3, .${zone}__content__middle h4, .${zone}__content__middle h5`);  		
-        
+        let nb = [];
 
-        //nombre de titre avec nb.length
-        for(let i=0; i<nb.length; i++){
-                if(document.getElementById(i).firstChild.nodeName=='#text'){   
-                    titres[i]=document.getElementById(i);  						// dans <h1>, affiché avec innerHTML
-                }else{
-                    titres[i]=document.getElementById(i).firstElementChild;  	//dans <a>, affiché avec innerHTML
-                }      
+        // récupère le numéro des id où il y a du content quand le noeud est un h
+        for(let i=0; i<500; i++){
+            if(document.getElementById('content_' + i) !== null){
+                if(document.getElementById('content_' + i).nodeName.search(/^h/i) !== -1)
+                {
+                    nb.push(i)
+                }
+            }
         }
+
+        let titleIndex = 0;
+
+        // Récupère les éléments où il y a un h dans une variable titre[]
+        for(let j=0; j<nb.length*2; j++){   //
+            if(nb.indexOf(j) !== (-1)){     //   
+                if(document.getElementById('content_' + j).firstChild.nodeName=='#text'){   
+                    titres[titleIndex]=document.getElementById('content_' + j);  
+                    titleIndex++;						
+                        // dans <h1>, affiché avec innerHTML
+                }else{
+                    titres[titleIndex]=document.getElementById('content_' + j).firstElementChild; 
+                    titleIndex++; 	
+                        //dans <a>, affiché avec innerHTML
+                }   
+            } 
+        }  
 
 
         let typetitre = [] ;	// récupère h1, h2, h3 ou h4 dans un tableau
@@ -450,58 +617,59 @@ export class View{
         }
 
 
-        for(var i = 0; i<titres.length; i++){			// essayer avec switch  et créer une fonction string(n)
+        for(var i = 0; i<titres.length; i++){	// essayer avec switch  et créer une fonction string(n)
+            let j=nb[i]
             if (typetitre[i]=='h1'){					// affiche titre1 (1, 2, ... ) devant + change le href
                 string += '<' + typetitre[i] + '><a href="#' + i + '">' + titre1 + '. ' + titres[i].innerHTML + '</' + typetitre[i] + '><br/>' ;
-                document.getElementById(i).innerHTML = titre1 + '. ' + main_titres(i) ; 		//titres[i].parentNode.innerHTML ;
+                document.getElementById('content_' + j).innerHTML = titre1 + '. ' + main_titres(i) ; 		//titres[i].parentNode.innerHTML ;
                 titre1++;
             } else if (typetitre[i]=='h2'){				// affiche titre2 (I, II, ... ) devant + change le href	
                 if(typetitre[i-1]=='h1'){				//permet de repartir à 0 si le chaptitre est clôt
                     local2=0;
                     string += '<' + typetitre[i] + '><a href="#' + i + '">' + titre2[local2] + '. ' + titres[i].innerHTML + '</' + typetitre[i] + '><br/>' ;	
-                    document.getElementById(i).innerHTML = titre2[local2] + '. ' +main_titres(i) ;	
+                    document.getElementById('content_' + j).innerHTML = titre2[local2] + '. ' +main_titres(i) ;	
                     local2++;
                 }else{									// incrémente titre2 et affiche les titres
                 string += '<' + typetitre[i] + '><a href="#' + i + '">' + titre2[local2] + '. ' + titres[i].innerHTML + '</' + typetitre[i] + '><br/>' ;
-                document.getElementById(i).innerHTML = titre2[local2] + '. ' + main_titres(i) ;		
+                document.getElementById('content_' + j).innerHTML = titre2[local2] + '. ' + main_titres(i) ;		
                 local2++;
                 }
             } else if (typetitre[i]=='h3'){
                 if(typetitre[i-1]=='h1'|| typetitre[i-1]=='h2' ){
                     local3=0;
                     string += '<' + typetitre[i] + '><a href="#' + i + '">' + titre3[local3] + '. ' + titres[i].innerHTML + '</' + typetitre[i] + '><br/>' ;
-                    document.getElementById(i).innerHTML = titre3[local3] + '. ' + main_titres(i) ;	
+                    document.getElementById('content_' + j).innerHTML = titre3[local3] + '. ' + main_titres(i) ;	
                     local3++;
                 }else{
                 string += '<' + typetitre[i] + '><a href="#' + i + '">' + titre3[local3] + '. ' + titres[i].innerHTML + '</' + typetitre[i] + '><br/>' ;
-                document.getElementById(i).innerHTML = titre3[local3] + '. ' + main_titres(i) ;	
+                document.getElementById('content_' + j).innerHTML = titre3[local3] + '. ' + main_titres(i) ;	
                 local3++;
                 }
             } else if (typetitre[i]=='h4'){
                 if(typetitre[i-1]=='h1'|| typetitre[i-1]=='h2'|| typetitre[i-1]=='h3'){
                     local4=0;
                     string += '<' + typetitre[i] + '><a href="#' + i + '">' + titre4[local4] + '. ' + titres[i].innerHTML + '</' + typetitre[i] + '><br/>' ;
-                    document.getElementById(i).innerHTML = titre4[local4] + '. ' + main_titres(i) ;	
+                    document.getElementById('content_' + j).innerHTML = titre4[local4] + '. ' + main_titres(i) ;	
                     local4++;
                 }else{
                 string += '<' + typetitre[i] + '><a href="#' + i + '">' + titre4[local4] + '. ' + titres[i].innerHTML + '</' + typetitre[i] + '><br/>' ;
-                document.getElementById(i).innerHTML = titre4[local4] + '. ' + main_titres(i) ;	
+                document.getElementById('content_' + j).innerHTML = titre4[local4] + '. ' + main_titres(i) ;	
                 local4++;
                 }
             } else if (typetitre[i]=='h5'){
                 if(typetitre[i-1]=='h1'|| typetitre[i-1]=='h2'|| typetitre[i-1]=='h3'|| typetitre[i-1]=='h4'){
                     local5=0;
                     string += '<' + typetitre[i] + '><a href="#' + i + '">' + titre5[local5] + '. ' + titres[i].innerHTML + '</' + typetitre[i] + '><br/>' ;
-                    document.getElementById(i).innerHTML = titre5[local5] + '. ' + main_titres(i) ;
+                    document.getElementById('content_' + j).innerHTML = titre5[local5] + '. ' + main_titres(i) ;
                     local5++;
                 }else{
                 string += '<' + typetitre[i] + '><a href="#' + i + '">' + titre5[local5] + '. ' + titres[i].innerHTML + '</' + typetitre[i] + '><br/>' ;
-                document.getElementById(i).innerHTML = titre5[local5] + '. ' + main_titres(i) ;
+                document.getElementById('content_' + j).innerHTML = titre5[local5] + '. ' + main_titres(i) ;
                 local5++;
                 }
             }else {
             string += '<' + typetitre[i] + '><a href="#' + i + '">' + '?' + titres[i].innerHTML + '</' + typetitre[i] + '><br/>' ;
-            document.getElementById(i).innerHTML =  '?. ' + main_titres(i) ;
+            document.getElementById('content_' + j).innerHTML =  '?. ' + main_titres(i) ;
             }
         }
 

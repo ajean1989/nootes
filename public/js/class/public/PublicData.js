@@ -26,7 +26,7 @@ export class PublicData{
         let outsideContent = await Fetch.jsonFetchGET('Public/outside');
         // outsideContent = [{user, note}] WHERE share=1
         this.outsideContent = outsideContent,
-        console.log(this.outsideContent);
+
 
         // OPTIMISATION : Charger outsideContent dans une propriété et l'utiliser pour chaque potentiel futur appel
 

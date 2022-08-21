@@ -56,10 +56,15 @@ if(preg_match($regex,$uri))
         case '/fetch/Private/inside':
             require_once $controlsDirectory . 'private'. DIRECTORY_SEPARATOR .'inside.php';
             break;
+        case '/fetch/Private/update':
+            require_once $controlsDirectory . 'private'. DIRECTORY_SEPARATOR .'update.php';
+            break;
+        case '/fetch/Private/add':
+            require_once $controlsDirectory . 'private'. DIRECTORY_SEPARATOR .'add.php';
+            break;
         case '/fetch/Private/disconnect':
             require_once $controlsDirectory . 'private'. DIRECTORY_SEPARATOR .'disconnect.php';
             break;
-
         
     }
 
