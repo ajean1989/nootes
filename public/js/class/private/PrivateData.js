@@ -65,31 +65,8 @@ export class PrivateData{
 
         this.nbOfInstance = this.nbOfInstance+1;
 
-        console.log('Private.modification : Private.insideContent');
-        console.log(Private.insideContent);
-        console.log('Private.modification : Private');
-        console.log(Private);
-        console.log('Private.modification : this');
-        console.log(this);
-        console.log('------------');
-
-        console.log('Private.modification : this.insideContent');
-
-        console.log(this.insideContent);
-        console.log(this.insideContent[0]);
-        console.log(this.insideContent[0].content_id);
-        
-
         newInsideContent[this.nbOfInstance] = new PrivateData();
         newInsideContent[this.nbOfInstance].insideContent = this.insideContent;
-
-
-        console.log('Private.modification : this.insideContent');
-        console.log(this.insideContent);
-        console.log(this.insideContent[0]);
-        console.log(this.insideContent[0].content_id);
-
-        console.log(newInsideContent[this.nbOfInstance].insideContent.length);
 
         let lineToUpdate = []
        
@@ -115,9 +92,7 @@ export class PrivateData{
             }
         }
     }
-        console.log('newInsideContent[this.nbOfInstance].insideContent}')
-        console.log(newInsideContent[this.nbOfInstance].insideContent);
-
+ 
 
         // Modifier les valeurs des positions 
 
@@ -133,10 +108,7 @@ export class PrivateData{
 
         insideContentToUpdate = JSON.stringify(insideContentToUpdate);
 
-        console.log('to fetch');
-        console.log(insideContentToUpdate);
-
-
+ 
         let fetchOptions = {method:'POST', headers:{'Content-Type' : 'application/json;charset=utf-8', 'Accept' : 'application/json'}, 
         body : insideContentToUpdate}; 
             
@@ -166,20 +138,21 @@ export class PrivateData{
 
         let indexOfLastInsideContent = newInsideContent[this.nbOfInstance].insideContent.length;
         
-        let lastInsideContent = newInsideContent[this.nbOfInstance].insideContent[indexOfLastInsideContent];
+        let lastInsideContent = newInsideContent[this.nbOfInstance].insideContent[indexOfLastInsideContent-1];
 
         newInsideContent[this.nbOfInstance].insideContent.push(lastInsideContent);
 
-        newInsideContent[this.nbOfInstance].insideContent[(lastInsideContent+1)].content = returnObject.content;
-        newInsideContent[this.nbOfInstance].insideContent[(lastInsideContent+1)].type = returnObject.type;
-        newInsideContent[this.nbOfInstance].insideContent[(lastInsideContent+1)].position = (returnObject.position)+1;
+
+        newInsideContent[this.nbOfInstance].insideContent[(indexOfLastInsideContent)].content = returnObject.content;
+        newInsideContent[this.nbOfInstance].insideContent[(indexOfLastInsideContent)].type = returnObject.type;
+        newInsideContent[this.nbOfInstance].insideContent[(indexOfLastInsideContent)].position = (newInsideContent[this.nbOfInstance].insideContent[(indexOfLastInsideContent-1)].position)+1;
 
 
         // Mise en forme pour l'envoie
 
         let insideContentToAdd = []
 
-        insideContentToAdd = JSON.stringify(newInsideContent[this.nbOfInstance].insideContent[(lastInsideContent+1)]);
+        insideContentToAdd = JSON.stringify(newInsideContent[this.nbOfInstance].insideContent[(indexOfLastInsideContent)]);
 
         console.log('to fetch');
         console.log(insideContentToAdd);

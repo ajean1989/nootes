@@ -385,165 +385,158 @@ export class View{
             middleSelector.removeChild(middleSelector.firstChild);
         }
  
+
         // Charge la page et tous ses évenements
+
+        let posIndex = 1;
         
-        for(let j=1; j<=insideContent.length; j = j+2)    //Recherhce la position 1, l'affiche
-        {                                               //Position 2, l'affiche  ... 
-            if(insideContent[j-1].position === j)
+
+        for(let i = 0; i <insideContent.length*2; i++){
+
+            let createLi = document.createElement('div');
+            createLi.id = 'li_' + i;
+
+            if(i % 2 !== 0) // Si i impaire
             {
+                for(let k=1; k<=insideContent.length; k++)    //Recherhce la position 1, l'affiche
+                {                                               //Position 2, l'affiche  ... 
+                    if(insideContent[k-1].position === posIndex)
+                    {
+                        
 
-                // Affiche chaque objet insideContent div:id-div:id->div:type->div:pos
+                        //Création du formulaire de modif
 
-                let k = j-1;
-                middleSelector.innerHTML += '<div id="li_' + k +'"></div><div id="li_' + j + '"><div class="move"></div><div id="pos_' + j +'"><' + insideContent[j-1].type + ' id="content_' + j + '">' + insideContent[j-1].content + '</' + insideContent[j-1].type + '></div></div>';
+                        let createMove = document.createElement('div');
+                        createMove.id = 'move';
+
+                        let createPos = document.createElement('div');
+                        createPos.id = 'pos_' + posIndex ;
+
+                        let createContent = document.createElement(insideContent[k-1].type);
+                        createContent.id = 'content_' + posIndex ;
+                        createContent.textContent = insideContent[k-1].content;
 
 
+                        
+                        middleSelector.appendChild(createLi);
+                        createLi.appendChild(createMove);
+                        createLi.appendChild(createPos);
+                        createPos.appendChild(createContent);
 
-                // Event : Affiche le formulaire de modification du content au dblclic
 
-                let liPositionId = document.getElementById('li_' + j);
-                let posId = document.getElementById('pos_' + j);
-             
+                        let posId = document.getElementById('pos_' + posIndex);
+                        let firstLi = document.getElementById('li_' + i);
+                      
 
-                posId.addEventListener('dblclick',()=>{
-                    let form = document.createElement('form'); 
-                    form.className = 'modifyForm'
-                    form.action = '';
+                        // Event au dblclick qui ouvre le form pour modif
 
-                    let textarea = document.createElement('textarea');
-                    textarea.className='modifyForm--textarea'
-                    textarea.name = 'content';
-                    textarea.textContent = insideContent[k].content;
+                        posId.addEventListener('dblclick', ()=>{
 
-                    form.appendChild(textarea);
-                   
-                    let typeSelect = document.createElement('select');
-                    typeSelect.name = 'type';
-    
-                    let typeOption =[];
-    
-                    typeOption[0] = document.createElement('option');
-                    typeOption[0].value = 'h1';
-                    typeOption[0].textContent = 'Titre1';
-    
-                    typeOption[1] = document.createElement('option');
-                    typeOption[1].value = 'h2';
-                    typeOption[1].textContent = 'Titre2';
-    
-                    typeOption[2] = document.createElement('option');
-                    typeOption[2].value = 'h3';
-                    typeOption[2].textContent = 'Titre3';
-    
-                    typeOption[3] = document.createElement('option');
-                    typeOption[3].value = 'h4';
-                    typeOption[3].textContent = 'Titre4';
-    
-                    typeOption[4] = document.createElement('option');
-                    typeOption[4].value = 'h5';
-                    typeOption[4].textContent = 'Titre5';
-    
-                    typeOption[5] = document.createElement('option');
-                    typeOption[5].value = 'p';
-                    typeOption[5].textContent = 'Paragraphe';
+                            ElementView.form(firstLi, posId, insideContent[k-1], 'modify');
 
-                    typeOption[6] = document.createElement('option');
-                    typeOption[6].value = '<pre><code>';
-                    typeOption[6].textContent = 'code';
-    
-    
-                    for(let l=0; l<7; l++){
-                        typeSelect.appendChild(typeOption[l]);
-                        if(insideContent[j-1].type === typeOption[l].value){
-                            typeOption[l].setAttribute('selected', "");
-                        }
-                    }
+                            let textarea = document.getElementById('contentForm--textarea');
+                            let entireForm = document.getElementById('contentForm');
 
-                        form.appendChild(typeSelect);
-             
-
-                        posId = liPositionId.replaceChild(form, posId);
-
-                        let modifyFormSelect = document.querySelector(".modifyForm");
-                        let textareaFormSelect = document.querySelector(".modifyForm--textarea");
-
-                        textareaFormSelect.focus();
-             
-                    // Event : Enregistre les modifs when press enter
-
-                    modifyFormSelect.addEventListener('keyup', (e) => {
-                        if(e.keyCode == 13) { // KeyCode de la touche entrée
-                            if (e.shiftKey == false){
-                                
-                                let returnObject = {}
                             
-                            console.log('press : Private.insideContent');
-                            console.log(Private.insideContent);
-                            console.log('press : Private');
-                            console.log(Private);
-                            console.log('press : this');
-                            console.log(this);
-                            console.log('------------');
+                            //Validation avec enter
 
-                                let newData = new FormData(modifyFormSelect);
-                                for(var pair of newData.entries()) {
+                            document.addEventListener('keydown', (e) => {
+                                if(e.key === 'Enter') {
+                                    e.preventDefault();
+                                    if (e.shiftKey == false){
+                                        e.preventDefault();
+                                        
+                                        let returnObject = {}
+                                   
+                                        let newData = new FormData(entireForm);
+                                        for(var pair of newData.entries()) {
+                                            returnObject[pair[0]] = pair[1];
+                                        }
+              
+                                        Private.modification(returnObject, insideContent[k-1].content_id);   
+                                    }
+                                }
+                            }, {once: true}); 
+
+                            
+                            // Validation avec un clic outside 
+
+                            document.addEventListener('click', (e)=>{
+                                e.preventDefault();
+                                let returnObject = {};
+                                    
+                                let newData = new FormData(entireForm);
+
+                                for(var pair of newData.entries())
+                                {
                                     returnObject[pair[0]] = pair[1];
                                 }
-                                console.log('returnObject : ');
-                                console.log(returnObject);
-                                console.log('content_id : ');
-                                console.log(insideContent[j-1].content_id)
-                                console.log('---------');
-                                Private.modification(returnObject, insideContent[j-1].content_id);       // Ne retourn pas à fonction d'origine 
-                            }
-                        }
-                    });
+                
+                                Private.modification(returnObject, insideContent[k-1].content_id);
+                            }, {once: true}); 
 
-                });
+                            
+
+                            entireForm.addEventListener('click', (e) => {
+                                e.stopPropagation();
+                                console.log('Form !');
+                             
+                            }); 
+
+                        });
+                    }
+                }
+                posIndex++;
             }
-
-            // Ajout bouton + 
-            middleSelector.innerHTML += '<button id="addContent">+</button>';
-            let addContentSelect = document.getElementById('addContent');
+            else{
+                middleSelector.appendChild(createLi);
+            }
             
+        }
+       
 
-            addContentSelect.addEventListener('click',()=>{
-                ElementView.form();
+  
+        // Ajout bouton + 
 
-                let addFormSelect = document.querySelector('.modifyForm--textarea'); 
+        let createPlus = document.createElement('button');
+        createPlus.id = 'addContent';
+        createPlus.textContent = '+';
+
+        middleSelector.appendChild(createPlus);
+
+        let addContentSelect = document.getElementById('addContent'); 
+          
+      
+     addContentSelect.addEventListener('click', () => {
+            ElementView.form(addContentSelect,createPlus);
+            
+            let entireForm = document.getElementById('contentForm');
+
+
+          
+            //let form = document.getElementById('contentForm');
                 
 
-                addFormSelect.addEventListener('keyup', (e) => {
-                    e.preventDefault();
-                    if(e.key === 'Enter'){ // KeyCode de la touche entrée
-                        if (e.shiftKey == false){
+            document.addEventListener('keyup', (e) => {
+                e.preventDefault();
+                if(e.key === 'Enter'){ // KeyCode de la touche entrée
+                    if (e.shiftKey == false){
                             
-                            let returnObject = {}
-                        
-                        console.log('press : Private.insideContent');
-                        console.log(Private.insideContent);
-                        console.log('press : Private');
-                        console.log(Private);
-                        console.log('press : this');
-                        console.log(this);
-                        console.log('------------');
-
-                            let newData = new FormData(form);
-                            for(var pair of newData.entries()) {
-                                returnObject[pair[0]] = pair[1];
-                            }
-                            console.log('returnObject : ');
-                            console.log(returnObject);
-                            console.log('content_id : ');
-                            console.log(insideContent[j-1].content_id)
-                            console.log('---------');
-                            Private.addContent(returnObject);       // Ne retourn pas à fonction d'origine 
+                        let returnObject = {}
+                    
+ 
+                        let newData = new FormData(entireForm);
+                        for(var pair of newData.entries()) {
+                            returnObject[pair[0]] = pair[1];
                         }
+                        Private.addContent(returnObject);      
                     }
-                })
-            })
-        }
+                }
+            });
+        });
         
         this.summary(zone);
+
     }
 
 

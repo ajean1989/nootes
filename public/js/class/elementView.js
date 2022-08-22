@@ -1,17 +1,30 @@
 export class ElementView{
 
-    static form (){
+    static form (firstLi, toReplace, insideContentLine, type){
+        //()
 
         let middleSelector = document.querySelector(`.Private__content__middle`);
 
-        let form = document.createElement('form'); 
+        console.log(firstLi);
+        console.log(toReplace);
+       
+        console.log(type);
+   
 
-        form.className = 'modifyForm'
+
+        let form = document.createElement('form'); 
+        form.id = 'contentForm'
         form.action = '';
+        
 
         let textarea = document.createElement('textarea');
-        textarea.className='modifyForm--textarea'
+        textarea.id='contentForm--textarea'
         textarea.name = 'content';
+        if(type === 'modify'){
+            textarea.value = insideContentLine.content;
+        }
+        
+     
        
 
         form.appendChild(textarea);
@@ -46,14 +59,41 @@ export class ElementView{
         typeOption[5].textContent = 'Paragraphe';
 
         typeOption[6] = document.createElement('option');
-        typeOption[6].value = '<pre><code>';
+        typeOption[6].value = 'code';
         typeOption[6].textContent = 'code';
 
-
-        typeOption[1].setAttribute('selected', "");
+        for(let l=0; l<7; l++){
+            typeSelect.appendChild(typeOption[l]);
+            if(type === 'modify')
+            {
+                if(insideContentLine.type === typeOption[l].value){
+                    typeOption[l].setAttribute('selected', "");
+                }
+            }
+            else 
+            {
+                typeOption[0].setAttribute('selected', "");
+            }
+        }
        
         form.appendChild(typeSelect);
 
-        middleSelector.replaceChild(form, addContent);
+
+        let deleteButton = document.createElement('button');
+        deleteButton.textContent = '-';
+        form.appendChild(deleteButton);
+
+        let image = document.createElement('input');
+        image.type = 'file';
+        //image.value = 'img';
+        form.appendChild(image);
+
+        if(type ==='modify'){
+            firstLi.replaceChild(form, toReplace);
+            textarea.focus();
+        }
+        else{
+        middleSelector.replaceChild(form, toReplace);
+        }
     }
 }

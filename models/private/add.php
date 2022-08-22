@@ -15,6 +15,6 @@ $statement->execute([
     'page_id'=>$json['page_id'],
     'type'=>$json['type'],
     'position'=>$json['position'],
-    'projection'=>$json['projection'],
+    'content'=>$json['content'],
 
 ]); 
