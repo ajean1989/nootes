@@ -5,12 +5,6 @@ export class ElementView{
 
         let middleSelector = document.querySelector(`.Private__content__middle`);
 
-        console.log(firstLi);
-        console.log(toReplace);
-       
-        console.log(type);
-   
-
 
         let form = document.createElement('form'); 
         form.id = 'contentForm'
@@ -94,6 +88,7 @@ export class ElementView{
         }
         else{
         middleSelector.replaceChild(form, toReplace);
+        textarea.focus();
         }
     }
 }

@@ -10,9 +10,7 @@ $json = json_decode($json,true);  // [[],[],...]
 Db::Connexion();
 
 for($i=0; $i<count($json); $i++){
-    $query = 'UPDATE note, page, content SET 
-            note.note_name = \'' .  $json[$i]['note_name'] . '\',
-            note.share = \'' .  $json[$i]['share'] . '\',
+    $query = 'UPDATE content SET 
             content.position = \'' .  $json[$i]['position'] . '\',
             content.type = \'' . $json[$i]['type'] . '\',
             content.content= \'' . $json[$i]['content'] . '\'

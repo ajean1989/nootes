@@ -25,7 +25,7 @@ export class PrivateData{
         //let status = await response.json();
         this.connexion = status.connexion;
 
-        if(status.status === 1){
+        if(status.connexion === 1){
             this.username =  status.username;
             this.mail =  status.mail;
             View.connnexionConfig();
@@ -59,7 +59,7 @@ export class PrivateData{
     }
 
 
-    modification = async (returnObject, content_id)  => {
+    modification = async (returnObject, content_id, pageClicked)  => {
 
         let newInsideContent = [];
 
@@ -67,7 +67,7 @@ export class PrivateData{
 
         newInsideContent[this.nbOfInstance] = new PrivateData();
         newInsideContent[this.nbOfInstance].insideContent = this.insideContent;
-
+     
         let lineToUpdate = []
        
 
@@ -112,16 +112,14 @@ export class PrivateData{
         let fetchOptions = {method:'POST', headers:{'Content-Type' : 'application/json;charset=utf-8', 'Accept' : 'application/json'}, 
         body : insideContentToUpdate}; 
             
-            
-        await Fetch.jsonFetchPOST('Private/update',fetchOptions);
-        
-        View.insideView(newInsideContent[this.nbOfInstance].insideContent, 'Private');
+        Fetch.jsonFetchPOST('Private/update',fetchOptions)
+        .then(View.insideView(newInsideContent[this.nbOfInstance].insideContent, pageClicked,'Private'))
 
     }
 
 
 
-    async addContent(returnObject){
+    async addContent(returnObject, pageClicked){  //return object {content: blabla, type:h1, ... } du form +
 
 
         // Nouvelle instance de PrivateData 
@@ -138,7 +136,7 @@ export class PrivateData{
 
         let indexOfLastInsideContent = newInsideContent[this.nbOfInstance].insideContent.length;
         
-        let lastInsideContent = newInsideContent[this.nbOfInstance].insideContent[indexOfLastInsideContent-1];
+        let lastInsideContent = newInsideContent[this.nbOfInstance].insideContent[(indexOfLastInsideContent-1)];
 
         newInsideContent[this.nbOfInstance].insideContent.push(lastInsideContent);
 
@@ -156,15 +154,18 @@ export class PrivateData{
 
         console.log('to fetch');
         console.log(insideContentToAdd);
+        console.log(newInsideContent[this.nbOfInstance].insideContent);
 
 
         let fetchOptions = {method:'POST', headers:{'Content-Type' : 'application/json;charset=utf-8', 'Accept' : 'application/json'}, 
         body : insideContentToAdd}; 
+
             
             
-        await Fetch.jsonFetchPOST('Private/add',fetchOptions);
+        Fetch.jsonFetchPOST('Private/add',fetchOptions)
+        .then(View.insideView(newInsideContent[this.nbOfInstance].insideContent, pageClicked, 'Private'))
+
         
-        View.insideView(newInsideContent[this.nbOfInstance].insideContent, 'Private');
 
     }
 

@@ -217,7 +217,7 @@ export class View{
 
 
 
-    static outsideView(outside,zone){
+    static async outsideView(outside,zone){
 
         // Affiche h3 nom -> li notes
             //onclick h3 nom + note -> li pages
@@ -258,7 +258,7 @@ export class View{
         }
      
 
-        let firstClick = (oneNote, zone) => {
+        let firstClick = async (oneNote, zone) => {
 
             // On efface ce qui pré-éxistait
 
@@ -270,6 +270,10 @@ export class View{
                 middleSelector.removeChild(middleSelector.firstChild);
             }
             middleSelector.textContent = 'Sélectionnez une page';
+
+
+
+            console.log(oneNote);
 
          
 
@@ -312,16 +316,24 @@ export class View{
                 notes_length++;
             }
 
+            let pageClicked=[];
+
             for (let i=0; i < notes_length; i++)
             {
                 let onePage = outside[i]; // {note_id, note_name, page_id, page_name}
+                pageClicked[i] = outside[i].page_id;
                 let elt = document.querySelector(`#${zone}__noteName__` + [i]);
+
                 elt.addEventListener('click', async (e)=>{
                     e.preventDefault();
                     let fetchOptions = {method:'POST', header:{'Content-Type':'application/json'}, body : onePage.page_id}
                     let insideContent = await Fetch.jsonFetchPOST(`${zone}/inside`, fetchOptions)
-                    Private.insideContent = insideContent;
-                    this.insideView(insideContent, zone);})
+                    Private.insideContent = await insideContent;
+                    console.log(insideContent);
+                    console.log(pageClicked[i]);
+                    console.log(zone);
+                    this.insideView(insideContent, pageClicked[i], zone);
+                });
             }
         }
 
@@ -362,6 +374,8 @@ export class View{
             }  
         }
 
+        // Au clic sur la note
+
         for (let i=0; i < outside_length; i++)
         {
             let oneNote = outside[i]; // {note_id, note_name, page_id, page_name}
@@ -375,15 +389,32 @@ export class View{
 
 
 
-    static insideView(insideContent,zone){
+    static insideView(insideContent, pageClicked, zone){ // insideContent = [{},{},...]
         // Charge contenu = f(page)
 
+        
+        console.log(insideContent);
+
+        //On filtre insideContent pour qu'il ne contienne que la page cliquée
+        
+        insideContent = insideContent.filter(insideContent => insideContent.page_id === pageClicked);
+        
+        console.log(insideContent);
+
+
+        // On efface ce qui pré éxistait
 
         let middleSelector = document.querySelector(`.${zone}__content__middle`);
+        let rightSelector = document.querySelector(`.${zone}__content__right`);
 
-        while (middleSelector.firstChild) {
-            middleSelector.removeChild(middleSelector.firstChild);
-        }
+      
+            while (middleSelector.firstChild) {
+                middleSelector.removeChild(middleSelector.firstChild);
+            }
+        
+            while (rightSelector.firstChild) {
+                rightSelector.removeChild(rightSelector.firstChild);
+            }
  
 
         // Charge la page et tous ses évenements
@@ -396,6 +427,8 @@ export class View{
             let createLi = document.createElement('div');
             createLi.id = 'li_' + i;
 
+            
+
             if(i % 2 !== 0) // Si i impaire
             {
                 for(let k=1; k<=insideContent.length; k++)    //Recherhce la position 1, l'affiche
@@ -404,7 +437,7 @@ export class View{
                     {
                         
 
-                        //Création du formulaire de modif
+                        //Affichage de la page
 
                         let createMove = document.createElement('div');
                         createMove.id = 'move';
@@ -427,63 +460,71 @@ export class View{
                         let posId = document.getElementById('pos_' + posIndex);
                         let firstLi = document.getElementById('li_' + i);
                       
+                        if(zone ==='Private'){
 
-                        // Event au dblclick qui ouvre le form pour modif
+                            // Event au dblclick qui ouvre le form pour modif
 
-                        posId.addEventListener('dblclick', ()=>{
+                            posId.addEventListener('dblclick', (e)=>{
+                                e.preventDefault;
+                                ElementView.form(firstLi, posId, insideContent[k-1], 'modify');
 
-                            ElementView.form(firstLi, posId, insideContent[k-1], 'modify');
+                                let textarea = document.getElementById('contentForm--textarea');
+                                let entireForm = document.getElementById('contentForm');
 
-                            let textarea = document.getElementById('contentForm--textarea');
-                            let entireForm = document.getElementById('contentForm');
+                                
+                                //Validation avec enter
 
-                            
-                            //Validation avec enter
-
-                            document.addEventListener('keydown', (e) => {
-                                if(e.key === 'Enter') {
-                                    e.preventDefault();
-                                    if (e.shiftKey == false){
-                                        e.preventDefault();
-                                        
-                                        let returnObject = {}
-                                   
-                                        let newData = new FormData(entireForm);
-                                        for(var pair of newData.entries()) {
-                                            returnObject[pair[0]] = pair[1];
-                                        }
-              
-                                        Private.modification(returnObject, insideContent[k-1].content_id);   
-                                    }
-                                }
-                            }, {once: true}); 
-
-                            
-                            // Validation avec un clic outside 
-
-                            document.addEventListener('click', (e)=>{
-                                e.preventDefault();
-                                let returnObject = {};
+                                document.addEventListener('keydown', (e) => {
+                                    if(e.key === 'Enter' && e.shiftKey === false) {                     
+                                            e.preventDefault();
+                                            
+                                            let returnObject = {}
                                     
-                                let newData = new FormData(entireForm);
+                                            let newData = new FormData(entireForm);
+                                            for(var pair of newData.entries()) {
+                                                returnObject[pair[0]] = pair[1];
+                                            }
+                                            console.log(returnObject);
+                                            if(returnObject !== undefined && returnObject['content'] !== ''){
+                                                Private.modification(returnObject, insideContent[k-1].content_id,pageClicked);
+                                                returnObject = undefined;
+                                            }
+                                    }
+                                }); 
 
-                                for(var pair of newData.entries())
-                                {
-                                    returnObject[pair[0]] = pair[1];
-                                }
-                
-                                Private.modification(returnObject, insideContent[k-1].content_id);
-                            }, {once: true}); 
+                                
+                                // Validation avec un clic outside 
 
-                            
+                                document.addEventListener('click', (e)=>{
+                                    e.preventDefault();
+                                    let returnObject = {};
+                                        
+                                    let newData = new FormData(entireForm);
 
-                            entireForm.addEventListener('click', (e) => {
-                                e.stopPropagation();
-                                console.log('Form !');
-                             
-                            }); 
+                                    for(var pair of newData.entries())
+                                    {
+                                        returnObject[pair[0]] = pair[1];
+                                    }
 
-                        });
+                                    console.log(returnObject);
+
+                                    if(returnObject !== undefined && returnObject['content'] !== ''){
+                                        Private.modification(returnObject, insideContent[k-1].content_id,pageClicked);
+                                        returnObject = undefined;
+                                    }
+                                }, {once: true}); 
+
+                                
+
+                                entireForm.addEventListener('click', (e) => {
+                                    e.stopPropagation();
+                                    console.log('Form !');
+                                
+                                }); 
+
+                            });
+
+                        }
                     }
                 }
                 posIndex++;
@@ -495,47 +536,120 @@ export class View{
         }
        
 
-  
-        // Ajout bouton + 
+        if(zone === 'Private'){
 
-        let createPlus = document.createElement('button');
-        createPlus.id = 'addContent';
-        createPlus.textContent = '+';
 
-        middleSelector.appendChild(createPlus);
+            // Ajout bouton + 
 
-        let addContentSelect = document.getElementById('addContent'); 
-          
-      
-     addContentSelect.addEventListener('click', () => {
-            ElementView.form(addContentSelect,createPlus);
+            let createPlus = document.createElement('button');
+            createPlus.id = 'addContent';
+            createPlus.textContent = '+';
+
+            middleSelector.appendChild(createPlus);
+
+            let addContentSelect = document.getElementById('addContent'); 
             
-            let entireForm = document.getElementById('contentForm');
+        
+            addContentSelect.addEventListener('click', (e) => {
+                e.preventDefault();
+                ElementView.form(addContentSelect,createPlus);
+                
+                let entireForm = document.getElementById('contentForm');
 
 
-          
-            //let form = document.getElementById('contentForm');
+
+
+
+
+
+
+                //Validation avec enter
+
+                document.addEventListener('keydown', (e) => {
+                    if(e.key === 'Enter' && e.shiftKey === false) {                     
+                            e.preventDefault();
+                            
+                            let returnObject = {}
+                    
+                            let newData = new FormData(entireForm);
+                            for(var pair of newData.entries()) {
+                                returnObject[pair[0]] = pair[1];
+                            }
+                            console.log(returnObject);
+                            if(returnObject !== undefined && returnObject['content'] !== ''){
+                                Private.addContent(returnObject, pageClicked); 
+                                returnObject = undefined;
+                            }
+                    }
+                }); 
+
+                
+                // Validation avec un clic outside 
+
+                document.addEventListener('click', (e)=>{
+                    e.preventDefault();
+                    let returnObject = {};
+                        
+                    let newData = new FormData(entireForm);
+
+                    for(var pair of newData.entries())
+                    {
+                        returnObject[pair[0]] = pair[1];
+                    }
+
+                    console.log(returnObject);
+
+                    if(returnObject !== undefined && returnObject['content'] !== ''){
+                        Private.addContent(returnObject, pageClicked); 
+                        returnObject = undefined;
+                    }
+                }, {once: true}); 
+
                 
 
-            document.addEventListener('keyup', (e) => {
-                e.preventDefault();
-                if(e.key === 'Enter'){ // KeyCode de la touche entrée
-                    if (e.shiftKey == false){
-                            
-                        let returnObject = {}
-                    
- 
-                        let newData = new FormData(entireForm);
-                        for(var pair of newData.entries()) {
-                            returnObject[pair[0]] = pair[1];
+                entireForm.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    console.log('Form !');
+                
+                }); 
+
+
+
+
+
+
+
+
+
+
+                /*
+                document.addEventListener('keyup', (e) => {
+                    e.preventDefault();
+                    if(e.key === 'Enter'){ // KeyCode de la touche entrée
+                        if (e.shiftKey == false){
+                                
+                            let returnObject = {}
+                        
+    
+                            let newData = new FormData(entireForm);
+                            for(var pair of newData.entries()) {
+                                returnObject[pair[0]] = pair[1];
+                            }
+                            if(returnObject !== undefined && returnObject['content'] !== ''){
+                                Private.addContent(returnObject, pageClicked); 
+                            }    
                         }
-                        Private.addContent(returnObject);      
                     }
-                }
+                });
+
+                */
             });
-        });
+
+        }
         
         this.summary(zone);
+
+        
 
     }
 
@@ -560,6 +674,10 @@ export class View{
                 }
             }
         }
+
+        console.log(nb);
+
+       
 
         let titleIndex = 0;
 
