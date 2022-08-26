@@ -47,7 +47,7 @@ export class PrivateData{
       
     }
 
-
+/*
     insideLoad = async () => {
         // Charge contenu = f(page)
         let response = await Fetch.jsonFetchGET('Private/inside');
@@ -57,6 +57,8 @@ export class PrivateData{
 
         View.insideView(insideContent, 'Private'); 
     }
+
+    */
 
 
     modification = async (returnObject, content_id, pageClicked)  => {
@@ -129,41 +131,86 @@ export class PrivateData{
         this.nbOfInstance = this.nbOfInstance+1;
 
         newInsideContent[this.nbOfInstance] = new PrivateData();
+
+        // Traite l'erreur si on souhaite ajouté un content si la page est vide
+
+        console.log('this.insideContent :');
+
+        console.log(this.insideContent);
+
+        if(this.insideContent.length !== 0)
+        {
         newInsideContent[this.nbOfInstance].insideContent = this.insideContent;
+        }
+        else{
+            newInsideContent[this.nbOfInstance].insideContent = [{content:'',type:'',position:0, page_id: pageClicked}];
+        }
+
+        console.log('newInsideContent[this.nbOfInstance].insideContent :');
+        console.log(newInsideContent[this.nbOfInstance].insideContent);
 
 
         //Ajout d'un objet content dans insideContent en copiant le dernier et modifiant avec les données de returnObject
 
-        let indexOfLastInsideContent = newInsideContent[this.nbOfInstance].insideContent.length;
-        
-        let lastInsideContent = newInsideContent[this.nbOfInstance].insideContent[(indexOfLastInsideContent-1)];
+        let iCLength = newInsideContent[this.nbOfInstance].insideContent.length;
+
+        let indexOfLastInsideContent;
+        let lastInsideContent;
+        for(let i=0; i<iCLength; i++){
+            if(i===1 && indexOfLastInsideContent>= 1){
+                if(newInsideContent[this.nbOfInstance].insideContent[i].position > newInsideContent[this.nbOfInstance].insideContent[i-1].position)
+                lastInsideContent = newInsideContent[this.nbOfInstance].insideContent[i].position;
+                indexOfLastInsideContent = i;
+            }else
+            {
+                lastInsideContent = newInsideContent[this.nbOfInstance].insideContent[i]
+                indexOfLastInsideContent = i;
+            }
+        }
+
+        console.log('lastInsideContent');
+        console.log(lastInsideContent);
 
         newInsideContent[this.nbOfInstance].insideContent.push(lastInsideContent);
 
+        console.log('newInsideContent[this.nbOfInstance].insideContent');
+        console.log(newInsideContent[this.nbOfInstance].insideContent);
+        console.log('newInsideContent[this.nbOfInstance].insideContent[(iCLength)]');
+        console.log(newInsideContent[this.nbOfInstance].insideContent[(iCLength)]);
+        console.log('iCLength');
+        console.log(iCLength);
 
-        newInsideContent[this.nbOfInstance].insideContent[(indexOfLastInsideContent)].content = returnObject.content;
-        newInsideContent[this.nbOfInstance].insideContent[(indexOfLastInsideContent)].type = returnObject.type;
-        newInsideContent[this.nbOfInstance].insideContent[(indexOfLastInsideContent)].position = (newInsideContent[this.nbOfInstance].insideContent[(indexOfLastInsideContent-1)].position)+1;
+
+
+        newInsideContent[this.nbOfInstance].insideContent[(iCLength)].content = returnObject.content;
+        newInsideContent[this.nbOfInstance].insideContent[(iCLength)].type = returnObject.type;
+        newInsideContent[this.nbOfInstance].insideContent[(iCLength)].position = (lastInsideContent.position)+1;
 
 
         // Mise en forme pour l'envoie
 
         let insideContentToAdd = []
 
-        insideContentToAdd = JSON.stringify(newInsideContent[this.nbOfInstance].insideContent[(indexOfLastInsideContent)]);
+        insideContentToAdd.push(JSON.stringify(newInsideContent[this.nbOfInstance].insideContent[(iCLength)]));
 
         console.log('to fetch');
         console.log(insideContentToAdd);
-        console.log(newInsideContent[this.nbOfInstance].insideContent);
+        console.log(newInsideContent[this.nbOfInstance].insideContent[(iCLength)]);
 
 
-        let fetchOptions = {method:'POST', headers:{'Content-Type' : 'application/json;charset=utf-8', 'Accept' : 'application/json'}, 
+        let fetchOptions1 = {method:'POST', headers:{'Content-Type' : 'application/json;charset=utf-8', 'Accept' : 'application/json'}, 
         body : insideContentToAdd}; 
 
-            
-            
-        Fetch.jsonFetchPOST('Private/add',fetchOptions)
-        .then(View.insideView(newInsideContent[this.nbOfInstance].insideContent, pageClicked, 'Private'))
+        let dontcare = await Fetch.jsonFetchPOST('Private/add',fetchOptions1);
+
+        let fetchOptions2 = {method:'POST', header:{'Content-Type':'application/json'}, body : pageClicked}
+
+        let insideContent = await Fetch.jsonFetchPOST(`Private/inside`, fetchOptions2)
+
+        Private.insideContent = await insideContent;
+
+
+        View.insideView(insideContent, pageClicked, 'Private');
 
         
 

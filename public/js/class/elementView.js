@@ -3,6 +3,7 @@ export class ElementView{
     static form (firstLi, toReplace, insideContentLine, type){
         //()
 
+
         let middleSelector = document.querySelector(`.Private__content__middle`);
 
 
@@ -87,8 +88,8 @@ export class ElementView{
             textarea.focus();
         }
         else{
-        middleSelector.replaceChild(form, toReplace);
-        textarea.focus();
+            middleSelector.replaceChild(form, toReplace);
+            textarea.focus();
         }
     }
 }
