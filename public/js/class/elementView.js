@@ -1,6 +1,8 @@
+import { Private } from "../index.js";
+
 export class ElementView{
 
-    static form (firstLi, toReplace, insideContentLine, type){
+    static form (firstLi, toReplace, insideContentLine, type, pageClicked){
         //()
 
 
@@ -74,9 +76,16 @@ export class ElementView{
         form.appendChild(typeSelect);
 
 
+        // Bouton delete
+
         let deleteButton = document.createElement('button');
+        deleteButton.id='btn--delete';
         deleteButton.textContent = '-';
         form.appendChild(deleteButton);
+
+
+
+        // Bouton img
 
         let image = document.createElement('input');
         image.type = 'file';

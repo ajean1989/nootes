@@ -310,7 +310,7 @@ export class View{
             for(let i in outside)
             {
                 let leftLi = document.createElement('li');
-                leftLi.id = `${zone}__noteName__` + [i];
+                leftLi.id = `${zone}__pageName__` + [i];
                 leftLi.textContent = outside[i].page_name;
                 leftUlSelector.appendChild(leftLi);
                 notes_length++;
@@ -322,7 +322,8 @@ export class View{
             {
                 let onePage = outside[i]; // {note_id, note_name, page_id, page_name}
                 pageClicked[i] = outside[i].page_id;
-                let elt = document.querySelector(`#${zone}__noteName__` + [i]);
+                let elt = document.querySelector(`#${zone}__pageName__` + [i]);
+                
 
                 elt.addEventListener('click', async (e)=>{
                     e.preventDefault();
@@ -398,7 +399,55 @@ export class View{
         let toModify = [];
 
 
-      
+        // Ajoute le bouton +, permet de le refermer grâce à type dans les fonction sendEvent
+        function addPlus(type){
+            let createPlus = document.createElement('button');
+            createPlus.id = 'addContent';
+            createPlus.textContent = '+';
+
+            if(type === 'return'){
+                let form = document.getElementById('contentForm')
+                middleSelector.replaceChild(createPlus, form);
+            }
+            else{
+                middleSelector.appendChild(createPlus);
+            }
+
+
+            let addContentSelect = document.getElementById('addContent'); 
+
+
+            // Au clic sur +
+            function clickEvent(e){
+                e.preventDefault();
+                e.stopPropagation();
+                ElementView.form(addContentSelect,createPlus);
+                
+                let entireForm = document.getElementById('contentForm');
+
+                addContentSelect.removeEventListener('click',clickEvent);
+
+                //Validation avec enter
+
+                document.addEventListener('keydown', handleAdd); 
+
+                
+                // Validation avec un clic outside 
+
+                document.addEventListener('click', handleAdd, {once: true}); 
+
+                
+
+                entireForm.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                });   
+            }
+    
+            addContentSelect.addEventListener('click',clickEvent);
+
+        }
+
+        // handle de +
         function handleAdd(e){
             if(e.type === 'click'){
                 e.preventDefault();
@@ -437,30 +486,17 @@ export class View{
             }
             else{
                 // Traiter si content = ''
-                //firstLi.replaceChild(toReplace, form);
+                addPlus('return');
             }
         }
     
-
-
-
-
-
-        
-
-    
-       
-
-    
-
 
 
         //On filtre insideContent pour qu'il ne contienne que la page cliquée
         
         insideContent = insideContent.filter(insideContent => insideContent.page_id === pageClicked);
         
-        
-
+    
         // On efface ce qui pré éxistait
 
         let middleSelector = document.querySelector(`.${zone}__content__middle`);
@@ -574,11 +610,31 @@ export class View{
                             function dblclickEvent(e){
                                 e.preventDefault;
                                 
-                                ElementView.form(firstLi, posId, insideContent[k-1], 'modify');
+                                ElementView.form(firstLi, posId, insideContent[k-1], 'modify', pageClicked);
+
+                                
+    
+
+
+                                function deleteHandle(e){
+                                    e.preventDefault();
+                                    deleteButton.removeEventListener('click', deleteHandle);
+                                    document.removeEventListener('keydown', handleModifyLine); 
+                                    document.removeEventListener('click', handleModifyLine, {once: true}); 
+                                    Private.deleteContent(insideContent[k-1], pageClicked);
+                                }
+
+                                let deleteButton = document.getElementById('btn--delete');
+                            
+                                deleteButton.addEventListener('click', deleteHandle);
+
+
 
                                 let entireForm = document.getElementById('contentForm');
 
                                 posId.removeEventListener('dblclick', dblclickEvent);
+                        
+                                
     
                                 //Validation avec enter
 
@@ -615,49 +671,41 @@ export class View{
 
             // Ajout bouton + 
 
-            let createPlus = document.createElement('button');
-            createPlus.id = 'addContent';
-            createPlus.textContent = '+';
-
-            middleSelector.appendChild(createPlus);
-
-            let addContentSelect = document.getElementById('addContent'); 
+            addPlus('add');
 
 
-            function clickEvent(e){
-                e.preventDefault();
-                e.stopPropagation();
-                ElementView.form(addContentSelect,createPlus);
-                
-                let entireForm = document.getElementById('contentForm');
 
-                addContentSelect.removeEventListener('click',clickEvent);
-
-                //Validation avec enter
-
-                document.addEventListener('keydown', handleAdd); 
-
-                
-                // Validation avec un clic outside 
-
-                document.addEventListener('click', handleAdd, {once: true}); 
-
-                
-
-                entireForm.addEventListener('click', (e) => {
-                    e.stopPropagation();
-                });   
-            }
             
-        
-            addContentSelect.addEventListener('click',clickEvent);
 
         }
-        
-        this.summary(zone);
 
-        
 
+        // Boucle qui permet de ne pas lancer le sommaire en si pas de titre (créé un bug sinon)
+
+        let isGood = false;
+        for(let i=0; i<insideContent.length; i++){
+                console.log('isGood');
+                console.log(insideContent[i].type);
+            let isTitle = insideContent[i].type.match(/^h/i);
+                console.log('isTitle');
+                console.log(isTitle);
+            if(isTitle !== null){
+                isGood = true
+                break;
+            }
+        } 
+        console.log('isGood');
+        console.log(isGood);
+
+        if(isGood === true){
+            this.summary(zone);
+            isGood = false;
+        }
+        else{
+            document.querySelector(`.${zone}__content__right`).innerHTML = 'Ajouter un titre créera un sommaire';
+        }
+        
+       
     }
 
 
@@ -792,5 +840,6 @@ export class View{
 
 
         document.querySelector(`.${zone}__content__right`).innerHTML = string; // Affiche le menu navright en HTML à l'emplacement id="navright"
+
     }
 }

@@ -47,18 +47,6 @@ export class PrivateData{
       
     }
 
-/*
-    insideLoad = async () => {
-        // Charge contenu = f(page)
-        let response = await Fetch.jsonFetchGET('Private/inside');
-        let insideContent = await response.json();
-
-        this.insideContent = insideContent;
-
-        View.insideView(insideContent, 'Private'); 
-    }
-
-    */
 
 
     modification = async (returnObject, content_id, pageClicked)  => {
@@ -107,6 +95,8 @@ export class PrivateData{
                 insideContentToUpdate.push(newInsideContent[this.nbOfInstance].insideContent[i])
             }
          }
+
+         this.insideContent = newInsideContent[this.nbOfInstance].insideContent
 
         insideContentToUpdate = JSON.stringify(insideContentToUpdate);
 
@@ -212,8 +202,95 @@ export class PrivateData{
 
         View.insideView(insideContent, pageClicked, 'Private');
 
+    }
+
+    deleteContent = async (insideContent, pageClicked)  => {
+    
+        // Nouvelle instance de PrivateData 
+
+        let newInsideContent = [];
+
+        this.nbOfInstance = this.nbOfInstance+1;
+
+        newInsideContent[this.nbOfInstance] = new PrivateData();
+
+        newInsideContent[this.nbOfInstance].insideContent = this.insideContent;
+
         
 
+        // Envoyer le requête delete à la db et retourner le nouveau insideContent (avec trou dans position)
+
+        let fetchOptions = {method:'POST', headers:{'Content-Type':'application/json;charset=utf-8', 'Accept':'application/json'}, body: insideContent.content_id}
+
+        let insideHoled = await Fetch.jsonFetchPOST('Private/delete', fetchOptions);
+
+
+        console.log('newInsideContent[this.nbOfInstance].insideContent :');
+        console.log(newInsideContent[this.nbOfInstance].insideContent);
+
+        console.log('insideContent :');
+        console.log(insideContent);
+
+        console.log('pageClicked :');
+        console.log(pageClicked);
+
+        insideHoled = newInsideContent[this.nbOfInstance].insideContent.filter(content => content.position !== insideContent.position && content.page_id === pageClicked);
+
+        
+        console.log('insideHoled :');
+        console.log(insideHoled);
+
+        // Traiter insideContent pour que les positions se suivent
+
+        let newInsideArray = [];
+
+        // Classe les positions dans l'ordre
+
+        for(let i=1; i<=(insideHoled.length)+1; i++){
+            for(let j=0; j<insideHoled.length; j++){
+                if(insideHoled[j].position === i){
+                    newInsideArray.push(insideHoled[j])
+                }
+            }
+        }
+
+        console.log('newInsideArray :');
+        console.log(newInsideArray);
+
+        console.log(newInsideArray[0]);
+
+
+        // Enlève le trou de position 
+        for(let i=0; i<newInsideArray.length; i++){
+            if(newInsideArray[i].position !== i+1){
+                newInsideArray[i].position = (newInsideArray[i].position) - 1; 
+            }
+        }
+
+        console.log('newInsideArray :');
+        console.log(newInsideArray);
+        
+
+        newInsideContent[this.nbOfInstance].insideContent = newInsideArray;
+
+        this.insideContent = newInsideContent[this.nbOfInstance].insideContent
+
+        console.log('newInsideContent[this.nbOfInstance].insideContent :');
+        console.log(newInsideContent[this.nbOfInstance].insideContent);
+
+        newInsideArray = JSON.stringify(newInsideArray);
+
+
+        // Update de la db
+
+        let fetchUpdateOptions = {method:'POST', headers:{'Content-Type':'application/json;charset=utf-8', 'Accept':'application/json'}, body: newInsideArray}
+
+
+        Fetch.jsonFetchPOST('Private/deleteUpdate',fetchUpdateOptions)
+        .then(View.insideView(newInsideContent[this.nbOfInstance].insideContent, pageClicked,'Private'))
+
+
+        // Appelle de la vue
     }
 
 

@@ -62,9 +62,17 @@ if(preg_match($regex,$uri))
         case '/fetch/Private/add':
             require_once $controlsDirectory . 'private'. DIRECTORY_SEPARATOR .'add.php';
             break;
+        case '/fetch/Private/delete':
+            require_once $controlsDirectory . 'private'. DIRECTORY_SEPARATOR .'delete.php';
+            break;
+         case '/fetch/Private/deleteUpdate':
+            require_once $controlsDirectory . 'private'. DIRECTORY_SEPARATOR .'deleteUpdate.php';
+               break;
         case '/fetch/Private/disconnect':
             require_once $controlsDirectory . 'private'. DIRECTORY_SEPARATOR .'disconnect.php';
             break;
+
+           
         
     }
 
