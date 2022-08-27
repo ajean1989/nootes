@@ -18,6 +18,12 @@
     }
 }
 
+.move{
+    height : 20px;
+    width : 20px;
+    background: $primary-color;
+}
+
 @for $i from 1 through 1000{
 
     #li_#{$i} {

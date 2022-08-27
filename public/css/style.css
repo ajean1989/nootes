@@ -28,6 +28,12 @@ body {
   outline-color: #FF922A;
 }
 
+.move {
+  height: 20px;
+  width: 20px;
+  background: #FF922A;
+}
+
 #li_1 {
   display: flex;
 }

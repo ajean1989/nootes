@@ -293,6 +293,209 @@ export class PrivateData{
         // Appelle de la vue
     }
 
+    dragAndDrop(pos ,target, pageClicked){
+
+        // target = li_n
+        // pos = ancienne position, pos_o   => o 
+        // newPos = nouvelle position, p
+
+        // Nouvelle instance de PrivateData 
+
+        let newInsideContent = [];
+
+        this.nbOfInstance = this.nbOfInstance+1;
+ 
+        newInsideContent[this.nbOfInstance] = new PrivateData();
+ 
+        newInsideContent[this.nbOfInstance].insideContent = this.insideContent;
+
+        // Faire correpondre le li à la bonne position
+
+        // (li/2)+1 = pos du dessus
+
+        pos = Number(pos.substring(4));
+
+        let newPos;
+
+        let direction;
+        if(pos > (Number(target.substring(3))+1)/2){    // si pos initiale < li
+            direction = 'down';
+        }
+        else if(pos < (Number(target.substring(3))+1)/2){
+            direction = 'up'
+        }
+        else{
+            View.insideView(this.insideContent, pageClicked,'Private')
+        }
+
+        if(direction === 'down'){
+            newPos = Number(target.substring(3))/2+1;
+        }
+        else if(direction === 'up'){
+            newPos = Number(target.substring(3))/2;
+        }
+        
+
+
+        
+
+       //let insideContentToUpdate =[]
+
+        // Remonter ou descendre toutes les positions qui sont entres les deux modifs
+        console.log('pos :');
+        console.log(pos);
+        console.log('newPos :');
+        console.log(newPos);
+        console.log('newInsideContent[this.nbOfInstance].insideContent: ');
+        console.log(newInsideContent[this.nbOfInstance].insideContent);
+
+        console.log('pageClicked :');
+        console.log(pageClicked);
+
+        let insideContentToUpdate;
+
+        console.log('insideContentToUpdate :');
+        console.log(insideContentToUpdate);
+
+
+        if(direction === 'down'){
+            insideContentToUpdate = newInsideContent[this.nbOfInstance].insideContent.filter(toChange => toChange.page_id === pageClicked && toChange.position >= newPos && toChange.position <= pos);
+            for(let content of insideContentToUpdate){
+                console.log(content);
+                content.position = (content.position)+1
+                if(content.position > pos)
+                {
+                    content.position = newPos;
+                }
+            }
+        }
+        if(direction === 'up'){
+            insideContentToUpdate = newInsideContent[this.nbOfInstance].insideContent.filter(toChange => toChange.page_id === pageClicked && toChange.position >= pos && toChange.position <= newPos);
+            for(let content of insideContentToUpdate){
+                console.log(content);
+                content.position = (content.position)-1
+                if(content.position < pos)
+                {
+                    content.position = newPos;
+                }
+            }
+        }
+        
+       
+
+        console.log('insideContentToUpdate :');
+        console.log(insideContentToUpdate);
+
+
+
+
+       /*
+        if(newPos < pos){
+
+            for(let j = newPos; j < pos; j++){  
+
+                console.log('un');
+
+                for(let i = 0; i < newInsideContent[this.nbOfInstance].insideContent.length; i++){
+                    console.log('deux :');
+                    if(newInsideContent[this.nbOfInstance].insideContent[i].page_id === pageClicked){
+                        console.log('troiq :');
+                        if(newInsideContent[this.nbOfInstance].insideContent[i].position === pos){
+                            console.log('quatres :');
+                            newInsideContent[this.nbOfInstance].insideContent[i].position = -1;
+                        }
+                    }
+                } 
+                
+                for(let i = 0; i < newInsideContent[this.nbOfInstance].insideContent.length; i++){
+                    if(newInsideContent[this.nbOfInstance].insideContent[i].page_id === pageClicked){
+                        if(newInsideContent[this.nbOfInstance].insideContent[i].position === j){
+                            console.log('j :');
+                            console.log(j);
+                            console.log('newInsideContent[this.nbOfInstance].insideContent[i].position :');
+                            console.log(newInsideContent[this.nbOfInstance].insideContent[i].position);
+                            console.log('(newInsideContent[this.nbOfInstance].insideContent[i].position)+1');
+                            console.log((newInsideContent[this.nbOfInstance].insideContent[i].position)+1);
+                            newInsideContent[this.nbOfInstance].insideContent[i].position = (newInsideContent[this.nbOfInstance].insideContent[i].position)+1;
+                            insideContentToUpdate.push(newInsideContent[this.nbOfInstance].insideContent[i]);
+                            console.log('insideContentToUpdate :');
+                            console.log(insideContentToUpdate);
+                        }
+                    }
+                }
+
+                for(let i = 0; i < newInsideContent[this.nbOfInstance].insideContent.length; i++){
+                    if(newInsideContent[this.nbOfInstance].insideContent[i].page_id === pageClicked){
+                        if(newInsideContent[this.nbOfInstance].insideContent[i].position === -1){
+                            newInsideContent[this.nbOfInstance].insideContent[i].position = newPos;
+                            insideContentToUpdate.push(newInsideContent[this.nbOfInstance].insideContent[i]);
+                        }
+                    }
+                }    
+            }
+        }
+        else if(newPos > pos){
+
+            for(let j = pos+1; j <= newPos; j++){  
+
+                //On attribue pos = -1 à l'élément dragged. Pour ne pas le prendre avec le nouveau qui prend sa pos ci-dessous
+                for(let i = 0; i < newInsideContent[this.nbOfInstance].insideContent.length; i++){
+                    if(newInsideContent[this.nbOfInstance].insideContent[i].page_id === pageClicked){
+                        if(newInsideContent[this.nbOfInstance].insideContent[i].position === pos){
+                            newInsideContent[this.nbOfInstance].insideContent[i].position = -1;
+                        }
+                    }
+                } 
+                  
+                // On redescend tout le monde (compris entre 2 pos cibles) d'une pos
+                for(let i = 0; i < newInsideContent[this.nbOfInstance].insideContent.length; i++){
+                    if(newInsideContent[this.nbOfInstance].insideContent[i].page_id === pageClicked){
+                        if(newInsideContent[this.nbOfInstance].insideContent[i].position === j){
+                            newInsideContent[this.nbOfInstance].insideContent[i].position = (newInsideContent[this.nbOfInstance].insideContent[i].position)-1;
+                            insideContentToUpdate.push(newInsideContent[this.nbOfInstance].insideContent[i]);
+                        }
+                    }
+                }
+
+                // On donne la bonne pos à l'élément dépacé
+                for(let i = 0; i < newInsideContent[this.nbOfInstance].insideContent.length; i++){
+                    if(newInsideContent[this.nbOfInstance].insideContent[i].page_id === pageClicked){
+                        if(newInsideContent[this.nbOfInstance].insideContent[i].position === -1){
+                            newInsideContent[this.nbOfInstance].insideContent[i].position = newPos;
+                            insideContentToUpdate.push(newInsideContent[this.nbOfInstance].insideContent[i]);
+                        }
+                    }
+                }
+                    
+            }
+        }
+        else{
+            View.insideView(this.insideContent, pageClicked, 'Private');
+        }
+*/
+        this.insideContent = newInsideContent[this.nbOfInstance].insideContent;
+        insideContentToUpdate = newInsideContent[this.nbOfInstance].insideContent
+
+        // maj db
+
+        console.log('insideContentToUpdate :');
+        console.log(insideContentToUpdate);
+
+        insideContentToUpdate = JSON.stringify(insideContentToUpdate);
+
+ 
+        let fetchOptions = {method:'POST', headers:{'Content-Type' : 'application/json;charset=utf-8', 'Accept' : 'application/json'}, 
+        body : insideContentToUpdate}; 
+            
+        Fetch.jsonFetchPOST('Private/update',fetchOptions)
+        .then(View.insideView(newInsideContent[this.nbOfInstance].insideContent, pageClicked,'Private'))
+        
+
+       
+
+
+    }
+
 
 
     disconnect = () => {

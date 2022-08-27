@@ -435,6 +435,7 @@ export class View{
                 // Validation avec un clic outside 
 
                 document.addEventListener('click', handleAdd, {once: true}); 
+              
 
                 
 
@@ -451,7 +452,6 @@ export class View{
         function handleAdd(e){
             if(e.type === 'click'){
                 e.preventDefault();
-                console.log('here');
                 document.removeEventListener('click', handleAdd, {once: true}); 
                 document.removeEventListener('keydown', handleAdd); 
                 sendAddEvent(e)
@@ -521,6 +521,7 @@ export class View{
 
             let createLi = document.createElement('div');
             createLi.id = 'li_' + i;
+            
 
             
 
@@ -536,10 +537,12 @@ export class View{
                         //Affichage de la page
 
                         let createMove = document.createElement('div');
-                        createMove.id = 'move';
+                        createMove.className = 'move';
+                        
 
                         let createPos = document.createElement('div');
                         createPos.id = 'pos_' + posIndex ;
+                        createPos.setAttribute('draggable', 'true');
 
                         let createContent = document.createElement(insideContent[k-1].type);
                         createContent.id = 'content_' + posIndex ;
@@ -548,7 +551,7 @@ export class View{
 
                         
                         middleSelector.appendChild(createLi);
-                        createLi.appendChild(createMove);
+                        //createLi.appendChild(createMove);
                         createLi.appendChild(createPos);
                         createPos.appendChild(createContent);
 
@@ -650,9 +653,12 @@ export class View{
                                 }); 
                             }
                             
-                            
-
+                
                             posId.addEventListener('dblclick', dblclickEvent);
+
+
+
+
                             
                         }
                     }
@@ -661,12 +667,77 @@ export class View{
             }
             else{
                 middleSelector.appendChild(createLi);
+
+               
+
             }
-            
+
         }
+
+        let createLi = document.createElement('div');
+        createLi.id = 'li_' + (posIndex-1)*2;
+        middleSelector.appendChild(createLi);
        
 
         if(zone === 'Private'){
+
+            let posId = [];
+           
+            let createLi = [];
+
+           
+           
+
+            // Drag and drop 
+            function dragStartHandler(e){
+
+                for(let i=0; i<(posIndex-1)*2+1; i++){
+                    if(i % 2 === 0){
+                        createLi[i] = document.getElementById('li_' + i);
+                        createLi[i].style.height = '5px';
+                        createLi[i].style.background = '#FF922A';
+                        createLi[i].style.opacity = '0.5';
+                    }
+                    
+                }
+                console.log('e.target.id');
+                console.log(e.target.id);
+                e.dataTransfer.setData("text/plain", e.target.id);
+            }
+
+            for(let i=1; i<=(posIndex-1); i++){
+                posId[i] = document.getElementById('pos_' + i);
+                posId[i].addEventListener('dragstart', dragStartHandler);
+     
+    
+            }
+
+
+            function dragOverHandler(e){
+                e.preventDefault();
+                e.dataTransfer.dropEffect = "move";
+            }
+
+            function dropHandler(e){
+                e.preventDefault();
+                console.log('e.dataTransfer');
+                console.log(e.dataTransfer);
+                let pos = e.dataTransfer.getData("text/plain");
+                let target = e.target.id;
+                console.log('e.target.id')
+                console.log(e.target.id)
+                console.log('pos');
+                console.log(pos);
+                Private.dragAndDrop(pos, target, pageClicked);
+            }
+            
+            for(let i=0; i<(posIndex-1)*2+1; i++){
+                if(i % 2 === 0){
+                    createLi[i] = document.getElementById('li_' + i);
+                    createLi[i].addEventListener('dragover',dragOverHandler);
+                    createLi[i].addEventListener('drop',dropHandler);
+                }
+            }
 
 
             // Ajout bouton + 
@@ -684,18 +755,12 @@ export class View{
 
         let isGood = false;
         for(let i=0; i<insideContent.length; i++){
-                console.log('isGood');
-                console.log(insideContent[i].type);
             let isTitle = insideContent[i].type.match(/^h/i);
-                console.log('isTitle');
-                console.log(isTitle);
             if(isTitle !== null){
                 isGood = true
                 break;
             }
         } 
-        console.log('isGood');
-        console.log(isGood);
 
         if(isGood === true){
             this.summary(zone);
@@ -705,7 +770,7 @@ export class View{
             document.querySelector(`.${zone}__content__right`).innerHTML = 'Ajouter un titre créera un sommaire';
         }
         
-       
+
     }
 
 
