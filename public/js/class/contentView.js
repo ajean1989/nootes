@@ -1,5 +1,6 @@
 import { Fetch } from './fetch.js';
 import { Private } from '../index.js';
+import { Public } from '../index.js';
 import { ElementView } from './elementView.js';
 
 
@@ -219,6 +220,8 @@ export class View{
 
     static async outsideView(outside,zone){
 
+        console.log(outside);
+
         // Affiche h3 nom -> li notes
             //onclick h3 nom + note -> li pages
                 // h3 onclick init - li loadInside
@@ -257,8 +260,11 @@ export class View{
             rightSelector.removeChild(rightSelector.firstChild);
         }
      
+      
 
         let firstClick = async (oneNote, zone) => {
+
+     
 
             // On efface ce qui pré-éxistait
 
@@ -279,24 +285,39 @@ export class View{
 
             // h4 + onclick
 
+        
+
             if(zone === 'Public'){ 
                 //Sélectionne par note_name dans Public où tous les outsides sont mélangé entre user
                 let oldOutside; 
                 oldOutside = outside;
+                console.log(oldOutside);
                 outside = outside.filter((outside) => outside.note_name === oneNote.note_name)
 
                 lefth4Selector.textContent = oneNote.note_name;
-                lefth4Selector.addEventListener('click', (e) => {
-                e.preventDefault; 
-                lefth4Selector.textContent = '';
-                this.outsideView(oldOutside, zone);})
+
+
+                let outsideClichandler = (e) => {
+                    e.preventDefault; 
+                    lefth4Selector.removeEventListener('click', outsideClichandler);
+                    lefth4Selector.textContent = '';
+                    Public.publicStep1();
+                }
+                
+                lefth4Selector.addEventListener('click', outsideClichandler);
             }
             else{
                 lefth4Selector.textContent = oneNote.note_name;
-                lefth4Selector.addEventListener('click', (e) => {
-                e.preventDefault; 
-                lefth4Selector.textContent = '';
-                this.outsideView(outside, zone);})
+
+                let outsideClichandler = (e) => {
+                    e.preventDefault; 
+                    lefth4Selector.removeEventListener('click', outsideClichandler);
+                    lefth4Selector.textContent = '';
+                    this.outsideView(outside, zone);
+                }
+
+                lefth4Selector.addEventListener('click', outsideClichandler);
+
             }
 
 
@@ -304,83 +325,388 @@ export class View{
 
             //Affiche les pages
 
-            let notes_length = 0;
      
-
+            // Ajoute les pages
             for(let i in outside)
             {
-                let leftLi = document.createElement('li');
-                leftLi.id = `${zone}__pageName__` + [i];
-                leftLi.textContent = outside[i].page_name;
-                leftUlSelector.appendChild(leftLi);
-                notes_length++;
+                if(outside[i].note_id === oneNote.note_id){
+                    let leftLi = document.createElement('li');
+                    leftLi.id = `${zone}__pageName__` + [outside[i].page_id];
+                    leftLi.textContent = outside[i].page_name;
+                    leftUlSelector.appendChild(leftLi);
+                }
+                
+            }       
+            // Ajoute le btn add
+            if(zone === 'Private'){
+                let addPage = document.createElement('button');
+                addPage.id = 'btn--left--add';
+                addPage.textContent = '+';
+                leftUlSelector.appendChild(addPage);
+
+                
+
+                function clickAddHandler(e){
+                    e.preventDefault();
+                    e.stopPropagation();
+                    addPage.removeEventListener('click', clickAddHandler);
+
+                    ElementView.notePageForm('add','note',outside);
+
+                    let notePageForm = document.getElementById('form--NotePage');
+
+                    function addNotePage(e){
+                        console.log(e);
+                        if(e.type === 'click'){
+                            e.preventDefault();
+                            document.removeEventListener('keydown', addNotePage);  
+                            document.removeEventListener('click', addNotePage, {once: true}); 
+                            sendEventLine(e)
+                        }
+                        else{
+                            if(e.key === 'Enter' && e.shiftKey === false) {  
+                                console.log("keypress");
+                                e.preventDefault();     
+                                document.removeEventListener('keydown', addNotePage); 
+                                document.removeEventListener('click', addNotePage, {once: true});             
+                                sendEventLine();
+                            }
+                        }
+                    }
+    
+                    function sendEventLine(){  // Fonction d'envoi du form lors de l'évenment
+                        
+                       let returnObject ={};
+                        let newData = new FormData(notePageForm);
+                        for(var pair of newData.entries()) {
+                            returnObject[pair[0]] = pair[1];
+                        }
+                    
+            
+                        if(returnObject !== 'undefined' && returnObject['page'] !== ''){
+                            Private.addNotePage(returnObject, oneNote, 'page');
+                        }
+                        else{
+                            // Traiter si content = ''
+                            //firstLi.replaceChild(toReplace, form);
+                        }
+                    }
+
+
+                    document.addEventListener('click', addNotePage, {once: true});
+                    document.addEventListener('keydown', addNotePage);
+
+                    notePageForm.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                    
+                    }); 
+    
+    
+                }
+    
+                addPage.addEventListener('click', clickAddHandler);
+
+                
             }
 
             let pageClicked=[];
 
-            for (let i=0; i < notes_length; i++)
-            {
-                let onePage = outside[i]; // {note_id, note_name, page_id, page_name}
-                pageClicked[i] = outside[i].page_id;
-                let elt = document.querySelector(`#${zone}__pageName__` + [i]);
-                
+         
 
-                elt.addEventListener('click', async (e)=>{
-                    e.preventDefault();
-                    let fetchOptions = {method:'POST', header:{'Content-Type':'application/json'}, body : onePage.page_id}
-                    let insideContent = await Fetch.jsonFetchPOST(`${zone}/inside`, fetchOptions)
-                    Private.insideContent = await insideContent;
-                    this.insideView(insideContent, pageClicked[i], zone);
-                });
+
+            for (let i=0; i < outside.length; i++)
+            {
+                if(outside[i].note_id === oneNote.note_id){
+                    let onePage = outside[i]; // {note_id, note_name, page_id, page_name}
+  
+
+                    pageClicked[i] = outside[i].page_id;
+                    let elt = document.querySelector(`#${zone}__pageName__` + [outside[i].page_id]);
+                  
+                    // Affiche un form pour modif au dbl clic et le content au clic
+                    let nbOfClick = 0;
+                    let clickOpenEvent = (e) => {
+                        e.preventDefault(); 
+                        nbOfClick++;
+                        if(nbOfClick === 1){
+                            setTimeout(async ()=>
+                            {
+                                if(nbOfClick === 1){
+                                    let fetchOptions = {method:'POST', header:{'Content-Type':'application/json'}, body : onePage.page_id}
+                                    let insideContent = await Fetch.jsonFetchPOST(`${zone}/inside`, fetchOptions)
+                                    Private.insideContent = await insideContent;
+                                    this.insideView(insideContent, pageClicked[i], zone);
+                                }
+                                else{
+                                    if(zone === 'Private'){
+                                        elt.removeEventListener('click', clickOpenEvent);
+                                        ElementView.notePageForm('modify','page',onePage, elt);
+    
+                                        let returnObject = {}
+                                        let notePageForm = document.getElementById('form--NotePage');
+    
+                                        function handleModifyNote(e){
+                                            console.log(e);
+                                            if(e.type === 'click'){
+                                                e.preventDefault();
+                                                document.removeEventListener('keydown', handleModifyNote);  
+                                                document.removeEventListener('click', handleModifyNote, {once: true}); 
+                                                sendEventLine(e)
+                                            }
+                                            else{
+                                                if(e.key === 'Enter' && e.shiftKey === false) {  
+                                                    console.log("keypress");
+                                                    e.preventDefault();     
+                                                    document.removeEventListener('keydown', handleModifyNote); 
+                                                    document.removeEventListener('click', handleModifyNote, {once: true});             
+                                                    sendEventLine(e)
+                                                }
+                                            }
+                                        }
+                        
+                                        function sendEventLine(e){  // Fonction d'envoi du form lors de l'évenment
+                                                
+                                            let newData = new FormData(notePageForm);
+                                            for(var pair of newData.entries()) {
+                                                returnObject[pair[0]] = pair[1];
+                                            }
+                                        
+                                
+                                            if(returnObject !== 'undefined' && returnObject['page'] !== ''){
+                                                Private.notePageModification(returnObject, onePage, 'page');
+                                            }
+                                            else{
+                                                // Traiter si content = ''
+                                                //firstLi.replaceChild(toReplace, form);
+                                            }
+                                        }
+    
+                                        document.addEventListener('click',handleModifyNote, {once: true});
+                                        document.addEventListener('keydown',handleModifyNote);
+    
+                                        notePageForm.addEventListener('click', (e) => {
+                                            e.stopPropagation();
+                                        
+                                        }); 
+    
+    
+    
+                                    }
+                                }
+                                nbOfClick = 0;
+                                
+                            },300);
+                        }
+                    }
+                    elt.addEventListener('click', clickOpenEvent);
+                }
+                
             }
         }
 
 
         // Affiche les notes
 
-        let outside_length = 0;
-        
-        
         let existLi = [];
-        for(let i in outside)
-        {   
-            if(zone === 'Private')
-            {
+        
+        for(let i in outside){   
+            if(zone === 'Private'){
                 if(existLi.indexOf(outside[i].note_name) === -1){  
-                    //si note_name n'est pas dans le tableau existLi
-
+                    //si note_name n'est pas dans le tableau existLi -- évite duplicata notes
+            
                     let leftLi = document.createElement('li');
-                    leftLi.id = `${zone}__noteName__` + [i];
+                    leftLi.id = `Private__noteName__` + [outside[i].note_id];
                     leftLi.textContent = outside[i].note_name;
                     leftUlSelector.appendChild(leftLi);
 
                     existLi.push(leftLi.textContent); 
-                    outside_length++;
                 }
             }
-            else
-            {
-                if(existLi.indexOf(outside[i].note_name + ' (' + outside[i].username + ')') === -1){
-                        let leftLi = document.createElement('li');
-                        leftLi.id = `${zone}__noteName__` + [i];
-                        leftLi.textContent = outside[i].note_name + ' (' + outside[i].username + ')';
-                        leftUlSelector.appendChild(leftLi);
+        }
 
-                        existLi.push(leftLi.textContent); 
-                        outside_length++;
-                    }        
+        for(let i in outside){   
+            if(zone === 'Public'){
+                if(existLi.indexOf(outside[i].note_name + ' (' + outside[i].username + ')') === -1){
+                    let leftLi = document.createElement('li');
+                    leftLi.id = `Public__noteName__` + [outside[i].note_id];
+                    leftLi.textContent = outside[i].note_name + ' (' + outside[i].username + ')';
+                    leftUlSelector.appendChild(leftLi);
+
+                    existLi.push(leftLi.textContent); 
+                }        
             }  
         }
+            // Bouton + des notes et pages
+        if(zone === 'Private'){
+            let addNote = document.createElement('button');
+            addNote.id = 'btn--left--add';
+            addNote.textContent = '+';
+            leftUlSelector.appendChild(addNote);
 
+            function clickAddHandler(e){
+                e.preventDefault();
+                e.stopPropagation();
+                addNote.removeEventListener('click', clickAddHandler);
+                ElementView.notePageForm('add','note',outside);
+
+                let notePageForm = document.getElementById('form--NotePage');
+
+                function addNotePage(e){
+                    console.log(e);
+                    if(e.type === 'click'){
+                        e.preventDefault();
+                        document.removeEventListener('keydown', addNotePage);  
+                        document.removeEventListener('click', addNotePage, {once: true}); 
+                        sendEventLine();
+                    }
+                    else{
+                        if(e.key === 'Enter' && e.shiftKey === false) {  
+                            console.log("keypress");
+                            e.preventDefault();     
+                            document.removeEventListener('keydown', addNotePage); 
+                            document.removeEventListener('click', addNotePage, {once: true});             
+                            sendEventLine();
+                        }
+                    }
+                }
+
+                function sendEventLine(){  // Fonction d'envoi du form lors de l'évenment
+                    
+                   let returnObject ={};
+                    let newData = new FormData(notePageForm);
+                    for(var pair of newData.entries()) {
+                        returnObject[pair[0]] = pair[1];
+                    }
+
+                    console.log(outside[0]);
+                
+        
+                    if(returnObject !== 'undefined' && returnObject['note'] !== ''){
+                        Private.addNotePage(returnObject, outside[0], 'note');
+                    }
+                    else{
+                        // Traiter si content = ''
+                        //firstLi.replaceChild(toReplace, form);
+                    }
+                }
+
+
+                document.addEventListener('click', addNotePage, {once: true});
+                document.addEventListener('keydown', addNotePage);
+
+                notePageForm.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                }); 
+
+
+            }
+
+            addNote.addEventListener('click', clickAddHandler);
+        }
+
+           
         // Au clic sur la note
 
-        for (let i=0; i < outside_length; i++)
+
+        for (let i=0; i < outside.length; i++)
         {
             let oneNote = outside[i]; // {note_id, note_name, page_id, page_name}
-            let elt = document.querySelector(`#${zone}__noteName__` + [i]);
-            elt.addEventListener('click', (e)=>{e.preventDefault();firstClick(oneNote, zone);})
+
+
+            // let elt
+            let elt = document.querySelector(`#${zone}__noteName__` + [outside[i].note_id]);
+
+ 
+
+            // Affiche un form pour modif au dbl clic et les pages au clic
+            let nbOfClick = 0;
+            function clickOpenEvent(e) {
+                e.preventDefault(); 
+                nbOfClick++;
+                if(nbOfClick === 1){
+                    setTimeout(function()
+                    {
+                        if(nbOfClick === 1){
+                        elt.removeEventListener('click', clickOpenEvent);
+                        firstClick(oneNote, zone);
+                        }
+                        else{
+                            if(zone === 'Private'){
+                                elt.removeEventListener('click', clickOpenEvent);
+                                ElementView.notePageForm('modify','note',oneNote, elt);
+
+                                let returnObject = {}
+                                let notePageForm = document.getElementById('form--NotePage');
+
+                                function handleModifyNote(e){
+                                    console.log(e);
+                                    if(e.type === 'click'){
+                                        e.preventDefault();
+                                        document.removeEventListener('keydown', handleModifyNote);  
+                                        document.removeEventListener('click', handleModifyNote, {once: true}); 
+                                        sendEventLine(e)
+                                    }
+                                    else{
+                                        if(e.key === 'Enter' && e.shiftKey === false) {  
+                                            console.log("keypress");
+                                            e.preventDefault();     
+                                            document.removeEventListener('keydown', handleModifyNote); 
+                                            document.removeEventListener('click', handleModifyNote, {once: true});             
+                                            sendEventLine(e)
+                                        }
+                                    }
+                                }
+                
+                                function sendEventLine(e){  // Fonction d'envoi du form lors de l'évenment
+                                        
+                                    let newData = new FormData(notePageForm);
+                                    for(var pair of newData.entries()) {
+                                        returnObject[pair[0]] = pair[1];
+                                    }
+                                   
+                        
+                                    if(returnObject !== 'undefined' && returnObject['content'] !== ''){
+                                        Private.notePageModification(returnObject, oneNote, 'note');
+                                    }
+                                    else{
+                                        // Traiter si content = ''
+                                        //firstLi.replaceChild(toReplace, form);
+                                    }
+                                }
+
+                                document.addEventListener('click',handleModifyNote, {once: true});
+                                document.addEventListener('keydown',handleModifyNote);
+
+                                notePageForm.addEventListener('click', (e) => {
+                                    e.stopPropagation();
+                                
+                                }); 
+
+
+
+                            }
+                        }
+                        nbOfClick = 0;
+                        
+                    },300);
+                }
+
+                
+
+
+
+
+
+
+            }
+
+            elt.addEventListener('click', clickOpenEvent);
         }
     }
+
+
+
+
 
 
 
@@ -611,14 +937,11 @@ export class View{
                             }
 
                             function dblclickEvent(e){
-                                e.preventDefault;
-                                
+                                e.preventDefault();
+        
                                 ElementView.form(firstLi, posId, insideContent[k-1], 'modify', pageClicked);
 
                                 
-    
-
-
                                 function deleteHandle(e){
                                     e.preventDefault();
                                     deleteButton.removeEventListener('click', deleteHandle);

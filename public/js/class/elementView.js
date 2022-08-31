@@ -101,4 +101,48 @@ export class ElementView{
             textarea.focus();
         }
     }
+
+
+    static notePageForm(type, what, outside, elt){
+        let leftUlSelector = document.querySelector(`.Private__content__left ul`);
+        let btnAdd = document.querySelector('#btn--left--add');
+    
+
+
+        let NotePageForm = document.createElement('form');
+        NotePageForm.id = 'form--NotePage';
+
+        let input = document.createElement('input');
+        input.name = 'input';
+
+        if(type === 'modify'){
+            let deleteBtn = document.createElement('button');
+            deleteBtn.textContent = '-';
+            NotePageForm.appendChild(deleteBtn);
+            if(what === 'note'){ 
+                input.value = outside.note_name;
+            }
+            else if(what === 'page'){
+                input.value = outside.page_name;
+            }
+        }
+
+        NotePageForm.appendChild(input);
+
+        
+        if(type === 'add'){
+            leftUlSelector.replaceChild(NotePageForm, btnAdd);
+        }
+        else if(type === 'modify' && what === 'note'){
+            leftUlSelector.replaceChild(NotePageForm, elt);
+            NotePageForm.focus();
+        }
+        else if(type === 'modify' && what === 'page'){
+            leftUlSelector.replaceChild(NotePageForm, elt);
+            NotePageForm.focus();
+        }
+
+
+
+    }
 }

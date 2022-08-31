@@ -109,6 +109,38 @@ export class PrivateData{
 
     }
 
+    async notePageModification(returnObject, oneOutside, type){
+
+
+        let toFetch;
+        if(type ==='note'){
+            toFetch = [returnObject,{'note_id':oneOutside.note_id},{'type':type}];
+        }
+        else if(type ==='page'){
+            toFetch = [returnObject,{'page_id':oneOutside.page_id},{'type':type}];
+        }
+
+
+        console.log(oneOutside);
+        console.log(toFetch);
+        
+
+   
+        toFetch = JSON.stringify(toFetch);
+
+        let fetchOptions = {method:'POST', headers:{'Content-Type' : 'application/json;charset=utf-8', 'Accept' : 'application/json'}, 
+        body : toFetch}; 
+            
+        let resp = await Fetch.jsonFetchPOST('Private/notePageUpdate',fetchOptions);
+        let outsideContent = await Fetch.jsonFetchGET('Private/outside');
+        this.outsideContent = outsideContent;
+        View.outsideView(outsideContent, 'Private');
+        
+
+
+
+    }
+
 
 
     async addContent(returnObject, pageClicked){  //return object {content: blabla, type:h1, ... } du form +
@@ -201,6 +233,37 @@ export class PrivateData{
 
 
         View.insideView(insideContent, pageClicked, 'Private');
+
+    }
+
+    async addNotePage(returnObject, oneNote, type){
+
+        console.log(oneNote);
+
+        let toFetch;
+        if(type ==='note'){
+            toFetch = [returnObject,{'type':type},{'note_id':oneNote.note_id}, {'user_id':oneNote.user_id}];
+        }
+        else if(type ==='page'){
+            toFetch = [returnObject,{'type':type},{'note_id':oneNote.note_id}];
+        }
+
+
+       
+        console.log(toFetch);
+        
+
+   
+        toFetch = JSON.stringify(toFetch);
+
+        let fetchOptions = {method:'POST', headers:{'Content-Type' : 'application/json;charset=utf-8', 'Accept' : 'application/json'}, 
+        body : toFetch}; 
+            
+        let resp = await Fetch.jsonFetchPOST('Private/notePageAdd',fetchOptions);
+        let outsideContent = await Fetch.jsonFetchGET('Private/outside');
+        this.outsideContent = outsideContent;
+        View.outsideView(outsideContent, 'Private');
+        
 
     }
 
