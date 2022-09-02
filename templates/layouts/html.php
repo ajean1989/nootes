@@ -16,6 +16,12 @@
             <h1>nootes</h1>
 		</header>
 
+        <div class="modal">
+            <?php 
+                echo $content;
+            ?>
+        </div>
+
         <div class="Public">
 
             <h2>Notes Publics</h2>

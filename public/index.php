@@ -73,10 +73,21 @@ if(preg_match($regex,$uri))
             break;
          case '/fetch/Private/deleteUpdate':
             require_once $controlsDirectory . 'private'. DIRECTORY_SEPARATOR .'deleteUpdate.php';
-               break;
+            break;
+        case '/fetch/Private/deletePageNote':
+            require_once $controlsDirectory . 'private'. DIRECTORY_SEPARATOR .'deletePageNote.php';
+            break;
+        case '/fetch/Private/deleteUser':
+            require_once $controlsDirectory . 'private'. DIRECTORY_SEPARATOR .'deleteUser.php';
+            break;
+        case '/fetch/Private/modifyPassword':
+            require_once $controlsDirectory . 'private'. DIRECTORY_SEPARATOR .'modifyPassword.php';
+            break;
         case '/fetch/Private/disconnect':
             require_once $controlsDirectory . 'private'. DIRECTORY_SEPARATOR .'disconnect.php';
             break;
+            
+       
             
 
            
@@ -85,7 +96,7 @@ if(preg_match($regex,$uri))
 
 }
 else{
-    require_once $layoutsDirectory . 'html.php';  
+    require_once $templatesDirectory . 'main.php';  
 }
 
 

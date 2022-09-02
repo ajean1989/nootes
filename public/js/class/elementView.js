@@ -109,16 +109,20 @@ export class ElementView{
     
 
 
-        let NotePageForm = document.createElement('form');
-        NotePageForm.id = 'form--NotePage';
+        let notePageForm = document.createElement('form');
+        notePageForm.id = 'form--NotePage';
 
         let input = document.createElement('input');
         input.name = 'input';
+        input.id = 'input--add--NotePage';
+
+
 
         if(type === 'modify'){
             let deleteBtn = document.createElement('button');
             deleteBtn.textContent = '-';
-            NotePageForm.appendChild(deleteBtn);
+            deleteBtn.id = 'btn--outside--delete';
+            notePageForm.appendChild(deleteBtn);
             if(what === 'note'){ 
                 input.value = outside.note_name;
             }
@@ -127,22 +131,33 @@ export class ElementView{
             }
         }
 
-        NotePageForm.appendChild(input);
+        notePageForm.appendChild(input);
 
         
         if(type === 'add'){
-            leftUlSelector.replaceChild(NotePageForm, btnAdd);
+            leftUlSelector.replaceChild(notePageForm, btnAdd);
+            input.focus();
         }
         else if(type === 'modify' && what === 'note'){
-            leftUlSelector.replaceChild(NotePageForm, elt);
-            NotePageForm.focus();
+            leftUlSelector.replaceChild(notePageForm, elt);
+            input.focus();
         }
         else if(type === 'modify' && what === 'page'){
-            leftUlSelector.replaceChild(NotePageForm, elt);
-            NotePageForm.focus();
+            leftUlSelector.replaceChild(notePageForm, elt);
+            input.focus();
         }
 
 
 
+    }
+
+
+    static closeModalInfo(){
+        let closeBtn = document.getElementById('btn--close_infomodal');
+        let infoModal = document.getElementById('dialog__info');
+        closeBtn.addEventListener('click', (e)=>{
+            e.preventDefault();
+            infoModal.close();
+        })
     }
 }

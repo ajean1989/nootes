@@ -2,6 +2,7 @@
 import { View } from '../contentView.js';
 import { Private } from '../../index.js'
 import { Fetch } from '../fetch.js';
+import { ElementView } from '../elementView.js';
 
 export class PrivateData{
 
@@ -22,7 +23,7 @@ export class PrivateData{
     status = async () => {
 
         let status = await Fetch.jsonFetchGET('Private/status');
-        //let status = await response.json();
+        let infoModal = document.getElementById('dialog__info');
         this.connexion = status.connexion;
 
         if(status.connexion === 1){
@@ -287,22 +288,9 @@ export class PrivateData{
 
         let insideHoled = await Fetch.jsonFetchPOST('Private/delete', fetchOptions);
 
-
-        console.log('newInsideContent[this.nbOfInstance].insideContent :');
-        console.log(newInsideContent[this.nbOfInstance].insideContent);
-
-        console.log('insideContent :');
-        console.log(insideContent);
-
-        console.log('pageClicked :');
-        console.log(pageClicked);
-
         insideHoled = newInsideContent[this.nbOfInstance].insideContent.filter(content => content.position !== insideContent.position && content.page_id === pageClicked);
 
-        
-        console.log('insideHoled :');
-        console.log(insideHoled);
-
+    
         // Traiter insideContent pour que les positions se suivent
 
         let newInsideArray = [];
@@ -316,11 +304,6 @@ export class PrivateData{
                 }
             }
         }
-
-        console.log('newInsideArray :');
-        console.log(newInsideArray);
-
-        console.log(newInsideArray[0]);
 
 
         // Enlève le trou de position 
@@ -338,9 +321,6 @@ export class PrivateData{
 
         this.insideContent = newInsideContent[this.nbOfInstance].insideContent
 
-        console.log('newInsideContent[this.nbOfInstance].insideContent :');
-        console.log(newInsideContent[this.nbOfInstance].insideContent);
-
         newInsideArray = JSON.stringify(newInsideArray);
 
 
@@ -351,6 +331,33 @@ export class PrivateData{
 
         Fetch.jsonFetchPOST('Private/deleteUpdate',fetchUpdateOptions)
         .then(View.insideView(newInsideContent[this.nbOfInstance].insideContent, pageClicked,'Private'))
+
+
+        // Appelle de la vue
+    }
+
+    deletePageNote(type ,oneNote){
+        //
+        let toFetch = {};
+        if(type === 'note'){
+            toFetch.note_id = oneNote.note_id;
+        }
+        else if(type === 'page'){
+            toFetch.page_id = oneNote.page_id;
+        }
+
+        console.log(toFetch);
+
+        toFetch = JSON.stringify(toFetch);
+
+
+        // Update de la db
+
+        let fetchUpdateOptions = {method:'POST', headers:{'Content-Type':'application/json;charset=utf-8', 'Accept':'application/json'}, body: toFetch}
+
+
+        Fetch.jsonFetchPOST('Private/deletePageNote',fetchUpdateOptions)
+        .then(Private.outsideLoad())
 
 
         // Appelle de la vue

@@ -156,7 +156,22 @@ export class View{
                 let formSignIn = new FormData(selectedFormSignIn);
                 let fetchOptions = {method:'POST', body: formSignIn};
                 let connexionData = await Fetch.jsonFetchPOST('Private/signin',fetchOptions);
-                console.log(connexionData);
+
+                // inscription réussie
+
+                if(connexionData.error === 'none')
+                {
+                    window.location.reload();
+                }
+
+                // Erreur d'inscription
+
+                else
+                {
+                    let error = document.createElement('p');
+                    middle.appendChild(error);
+                    error.textContent = connexionData.error;
+                }
             }
 
             selectedFormSignIn.addEventListener('submit', async (e) => {
@@ -180,7 +195,7 @@ export class View{
     static connnexionConfig(){
         let header = document.querySelector('header');
         let disconnectSelector = document.querySelector('.btn--disconnect')
-        let profilSelector = document.querySelector('.btn--profil')
+        let profilSelector = document.querySelector('#btn--profil')
         
     
         if(Private.connexion === 1)
@@ -196,7 +211,7 @@ export class View{
                 this.connnexionConfig();});
 
             let profil = document.createElement('button')
-            profil.className = 'btn--profil';
+            profil.id = 'btn--profil';
             profil.textContent = 'Profil';
             header.appendChild(profil);
             profil.addEventListener('click',(e)=>{
@@ -213,6 +228,85 @@ export class View{
 
 
 
+    static profilView(){
+        
+        let profilModal = document.getElementById('dialog__profil');
+        let closeModal = document.getElementById('btn--close_modal');
+        let deleteUserBtn = document.getElementById('btn--delete_account');
+        let modifyPassBtn = document.getElementById('btn--modify_Password');
+        let infoModal = document.getElementById('dialog__info');
+        let passForm = document.getElementById('form--modifyPass');
+        
+        profilModal.showModal();
+
+        function closeHandler(e){
+            e.preventDefault();
+            
+            passForm.removeEventListener('submit', modifyPassHandler);
+            deleteUserBtn.removeEventListener('click', deleteUserHandler);
+            closeModal.removeEventListener('click', closeHandler);
+
+            profilModal.close();
+        }
+
+        closeModal.addEventListener('click', closeHandler);
+
+
+        async function deleteUserHandler(e){
+            e.preventDefault();
+
+            passForm.removeEventListener('submit', modifyPassHandler);
+            deleteUserBtn.removeEventListener('click', deleteUserHandler);
+            closeModal.removeEventListener('click', closeHandler);
+
+            let resp = await Fetch.jsonFetchGET('Private/deleteUser');
+            profilModal.close();
+            window.location.reload();
+        }
+
+        deleteUserBtn.addEventListener('click', deleteUserHandler);
+
+
+        async function modifyPassHandler(e){
+            e.preventDefault();
+
+            passForm.removeEventListener('submit', modifyPassHandler);
+            deleteUserBtn.removeEventListener('click', deleteUserHandler);
+            closeModal.removeEventListener('click', closeHandler);
+            
+            let newPassword = new FormData(passForm);
+          
+            let fetchOptions = {method:'POST', body:newPassword};
+
+            let response = await Fetch.jsonFetchPOST('Private/modifyPassword',fetchOptions);
+            console.log(response);
+
+            if(response.valid === 1 ){
+                profilModal.close();
+                infoModal.showModal();
+                ElementView.closeModalInfo();
+            }
+            else if(response.valid === 0){
+                infoModal.showModal();
+                ElementView.closeModalInfo();
+            }
+
+        }
+        passForm.addEventListener('submit', modifyPassHandler);
+
+
+
+
+
+
+
+    
+        
+
+    
+   
+    }
+
 
 
 
@@ -220,7 +314,6 @@ export class View{
 
     static async outsideView(outside,zone){
 
-        console.log(outside);
 
         // Affiche h3 nom -> li notes
             //onclick h3 nom + note -> li pages
@@ -265,7 +358,6 @@ export class View{
         let firstClick = async (oneNote, zone) => {
 
      
-
             // On efface ce qui pré-éxistait
 
             while (leftUlSelector.firstChild) {
@@ -280,18 +372,12 @@ export class View{
 
 
 
-
-         
-
             // h4 + onclick
-
-        
 
             if(zone === 'Public'){ 
                 //Sélectionne par note_name dans Public où tous les outsides sont mélangé entre user
                 let oldOutside; 
                 oldOutside = outside;
-                console.log(oldOutside);
                 outside = outside.filter((outside) => outside.note_name === oneNote.note_name)
 
                 lefth4Selector.textContent = oneNote.note_name;
@@ -353,10 +439,11 @@ export class View{
 
                     ElementView.notePageForm('add','note',outside);
 
+
                     let notePageForm = document.getElementById('form--NotePage');
+                    
 
                     function addNotePage(e){
-                        console.log(e);
                         if(e.type === 'click'){
                             e.preventDefault();
                             document.removeEventListener('keydown', addNotePage);  
@@ -365,7 +452,6 @@ export class View{
                         }
                         else{
                             if(e.key === 'Enter' && e.shiftKey === false) {  
-                                console.log("keypress");
                                 e.preventDefault();     
                                 document.removeEventListener('keydown', addNotePage); 
                                 document.removeEventListener('click', addNotePage, {once: true});             
@@ -376,19 +462,19 @@ export class View{
     
                     function sendEventLine(){  // Fonction d'envoi du form lors de l'évenment
                         
-                       let returnObject ={};
+                        let returnObject = {};
                         let newData = new FormData(notePageForm);
                         for(var pair of newData.entries()) {
                             returnObject[pair[0]] = pair[1];
                         }
                     
             
-                        if(returnObject !== 'undefined' && returnObject['page'] !== ''){
+                        if(returnObject !== 'undefined' && returnObject['input'] !== ''){
                             Private.addNotePage(returnObject, oneNote, 'page');
                         }
                         else{
                             // Traiter si content = ''
-                            //firstLi.replaceChild(toReplace, form);
+                            firstClick(oneNote, zone);
                         }
                     }
 
@@ -398,7 +484,6 @@ export class View{
 
                     notePageForm.addEventListener('click', (e) => {
                         e.stopPropagation();
-                    
                     }); 
     
     
@@ -424,6 +509,7 @@ export class View{
                     let elt = document.querySelector(`#${zone}__pageName__` + [outside[i].page_id]);
                   
                     // Affiche un form pour modif au dbl clic et le content au clic
+
                     let nbOfClick = 0;
                     let clickOpenEvent = (e) => {
                         e.preventDefault(); 
@@ -440,32 +526,35 @@ export class View{
                                 else{
                                     if(zone === 'Private'){
                                         elt.removeEventListener('click', clickOpenEvent);
+
                                         ElementView.notePageForm('modify','page',onePage, elt);
-    
-                                        let returnObject = {}
+
                                         let notePageForm = document.getElementById('form--NotePage');
+                                    
+                                        let returnObject = {}
+
     
                                         function handleModifyNote(e){
-                                            console.log(e);
+                                            
                                             if(e.type === 'click'){
                                                 e.preventDefault();
                                                 document.removeEventListener('keydown', handleModifyNote);  
                                                 document.removeEventListener('click', handleModifyNote, {once: true}); 
-                                                sendEventLine(e)
+                                                sendEventLine()
                                             }
                                             else{
                                                 if(e.key === 'Enter' && e.shiftKey === false) {  
-                                                    console.log("keypress");
                                                     e.preventDefault();     
                                                     document.removeEventListener('keydown', handleModifyNote); 
                                                     document.removeEventListener('click', handleModifyNote, {once: true});             
-                                                    sendEventLine(e)
+                                                    sendEventLine()
                                                 }
                                             }
                                         }
                         
-                                        function sendEventLine(e){  // Fonction d'envoi du form lors de l'évenment
-                                                
+                                        // Fonction d'envoi du form lors de l'évenment
+
+                                        function sendEventLine(){   
                                             let newData = new FormData(notePageForm);
                                             for(var pair of newData.entries()) {
                                                 returnObject[pair[0]] = pair[1];
@@ -477,7 +566,7 @@ export class View{
                                             }
                                             else{
                                                 // Traiter si content = ''
-                                                //firstLi.replaceChild(toReplace, form);
+                                                Private.deletePageNote('page',onePage);
                                             }
                                         }
     
@@ -488,9 +577,23 @@ export class View{
                                             e.stopPropagation();
                                         
                                         }); 
-    
-    
-    
+
+
+                                        // Delete page
+
+                                        function deleteHandle(e){
+                                            e.preventDefault();
+                                            btnDelete.removeEventListener('click', deleteHandle);
+                                            document.removeEventListener('keydown',handleModifyNote); 
+                                            document.removeEventListener('click',handleModifyNote, {once: true}); 
+                                        
+            
+                                            Private.deletePageNote('page',onePage);
+                                        }
+                        
+                                        let btnDelete = document.getElementById('btn--outside--delete');
+                                    
+                                        btnDelete.addEventListener('click', deleteHandle);
                                     }
                                 }
                                 nbOfClick = 0;
@@ -536,7 +639,9 @@ export class View{
                 }        
             }  
         }
-            // Bouton + des notes et pages
+
+        // Bouton + des notes
+
         if(zone === 'Private'){
             let addNote = document.createElement('button');
             addNote.id = 'btn--left--add';
@@ -547,12 +652,12 @@ export class View{
                 e.preventDefault();
                 e.stopPropagation();
                 addNote.removeEventListener('click', clickAddHandler);
+
                 ElementView.notePageForm('add','note',outside);
 
                 let notePageForm = document.getElementById('form--NotePage');
 
                 function addNotePage(e){
-                    console.log(e);
                     if(e.type === 'click'){
                         e.preventDefault();
                         document.removeEventListener('keydown', addNotePage);  
@@ -561,7 +666,6 @@ export class View{
                     }
                     else{
                         if(e.key === 'Enter' && e.shiftKey === false) {  
-                            console.log("keypress");
                             e.preventDefault();     
                             document.removeEventListener('keydown', addNotePage); 
                             document.removeEventListener('click', addNotePage, {once: true});             
@@ -572,21 +676,19 @@ export class View{
 
                 function sendEventLine(){  // Fonction d'envoi du form lors de l'évenment
                     
-                   let returnObject ={};
+                    let returnObject ={};
                     let newData = new FormData(notePageForm);
+
                     for(var pair of newData.entries()) {
                         returnObject[pair[0]] = pair[1];
                     }
 
-                    console.log(outside[0]);
-                
-        
-                    if(returnObject !== 'undefined' && returnObject['note'] !== ''){
+                    if(returnObject !== 'undefined' && returnObject['input'] !== ''){
                         Private.addNotePage(returnObject, outside[0], 'note');
                     }
                     else{
                         // Traiter si content = ''
-                        //firstLi.replaceChild(toReplace, form);
+                        View.outsideView(outside,zone);
                     }
                 }
 
@@ -597,10 +699,7 @@ export class View{
                 notePageForm.addEventListener('click', (e) => {
                     e.stopPropagation();
                 }); 
-
-
             }
-
             addNote.addEventListener('click', clickAddHandler);
         }
 
@@ -639,7 +738,6 @@ export class View{
                                 let notePageForm = document.getElementById('form--NotePage');
 
                                 function handleModifyNote(e){
-                                    console.log(e);
                                     if(e.type === 'click'){
                                         e.preventDefault();
                                         document.removeEventListener('keydown', handleModifyNote);  
@@ -647,8 +745,7 @@ export class View{
                                         sendEventLine(e)
                                     }
                                     else{
-                                        if(e.key === 'Enter' && e.shiftKey === false) {  
-                                            console.log("keypress");
+                                        if(e.key === 'Enter' && e.shiftKey === false) { 
                                             e.preventDefault();     
                                             document.removeEventListener('keydown', handleModifyNote); 
                                             document.removeEventListener('click', handleModifyNote, {once: true});             
@@ -657,7 +754,7 @@ export class View{
                                     }
                                 }
                 
-                                function sendEventLine(e){  // Fonction d'envoi du form lors de l'évenment
+                                function sendEventLine(){  // Fonction d'envoi du form lors de l'évenment
                                         
                                     let newData = new FormData(notePageForm);
                                     for(var pair of newData.entries()) {
@@ -665,12 +762,12 @@ export class View{
                                     }
                                    
                         
-                                    if(returnObject !== 'undefined' && returnObject['content'] !== ''){
+                                    if(returnObject !== 'undefined' && returnObject['note'] !== ''){
                                         Private.notePageModification(returnObject, oneNote, 'note');
                                     }
                                     else{
                                         // Traiter si content = ''
-                                        //firstLi.replaceChild(toReplace, form);
+                                        Private.deletePageNote('note' ,oneNote);
                                     }
                                 }
 
@@ -683,23 +780,25 @@ export class View{
                                 }); 
 
 
-
+                                function deleteHandle(e){
+                                    e.preventDefault();
+                                    btnDelete.removeEventListener('click', deleteHandle);
+                                    document.removeEventListener('keydown', handleModifyNote); 
+                                    document.removeEventListener('click', handleModifyNote, {once: true}); 
+                                
+    
+                                    Private.deletePageNote('note',oneNote);
+                                }
+                
+                                let btnDelete = document.getElementById('btn--outside--delete');
+                            
+                                btnDelete.addEventListener('click', deleteHandle);
                             }
                         }
                         nbOfClick = 0;
-                        
                     },300);
                 }
-
-                
-
-
-
-
-
-
             }
-
             elt.addEventListener('click', clickOpenEvent);
         }
     }
@@ -716,16 +815,14 @@ export class View{
     static insideView(insideContent, pageClicked, zone){ // insideContent = [{},{},...]
         // Charge contenu = f(page)
 
-        console.log('appel de insideView');
 
-   
         let entireForm;
         let returnObject = {};
         let newData;
-        let toModify = [];
-
+     
 
         // Ajoute le bouton +, permet de le refermer grâce à type dans les fonction sendEvent
+
         function addPlus(type){
             let createPlus = document.createElement('button');
             createPlus.id = 'addContent';
@@ -739,11 +836,11 @@ export class View{
                 middleSelector.appendChild(createPlus);
             }
 
-
             let addContentSelect = document.getElementById('addContent'); 
 
 
             // Au clic sur +
+
             function clickEvent(e){
                 e.preventDefault();
                 e.stopPropagation();
@@ -756,15 +853,11 @@ export class View{
                 //Validation avec enter
 
                 document.addEventListener('keydown', handleAdd); 
-
-                
+  
                 // Validation avec un clic outside 
 
                 document.addEventListener('click', handleAdd, {once: true}); 
-              
-
-                
-
+             
                 entireForm.addEventListener('click', (e) => {
                     e.stopPropagation();
                 });   
@@ -775,24 +868,25 @@ export class View{
         }
 
         // handle de +
+
         function handleAdd(e){
             if(e.type === 'click'){
                 e.preventDefault();
                 document.removeEventListener('click', handleAdd, {once: true}); 
                 document.removeEventListener('keydown', handleAdd); 
-                sendAddEvent(e)
+                sendAddEvent()
             }
             else{
                 if(e.key === 'Enter' && e.shiftKey === false) {  
                     e.preventDefault();    
                     document.removeEventListener('keydown', handleAdd); 
                     document.removeEventListener('click', handleAdd, {once: true});            
-                    sendAddEvent(e)
+                    sendAddEvent()
                 }
             }
         }
 
-        function sendAddEvent(e){  // Fonction d'envoi du form lors de l'évenment
+        function sendAddEvent(){  // Fonction d'envoi du form lors de l'évenment
                                     
             returnObject = {}
             entireForm = document.getElementById('contentForm');
@@ -816,7 +910,6 @@ export class View{
             }
         }
     
-
 
         //On filtre insideContent pour qu'il ne contienne que la page cliquée
         
@@ -849,17 +942,12 @@ export class View{
             createLi.id = 'li_' + i;
             
 
-            
-
             if(i % 2 !== 0) // Si i impaire
             {
                 for(let k=1; k<=insideContent.length; k++)    //Recherhce la position 1, l'affiche
                 {                                               //Position 2, l'affiche  ... 
                     if(insideContent[k-1].position === posIndex)
                     {
-                    
-                        
-
                         //Affichage de la page
 
                         let createMove = document.createElement('div');
@@ -888,17 +976,11 @@ export class View{
                       
                         if(zone ==='Private'){
 
-                           
-                        
-
                             // Event au dblclick qui ouvre le form pour modif
-
-                    
 
                             // Ces deux fonctions sont spécialement pour les events modify ( dans la boucle car sinon il faut insideContent[k-1] n'est pas récupéré)
 
                             function handleModifyLine(e){
-                                console.log(e);
                                 if(e.type === 'click'){
                                     e.preventDefault();
                                     document.removeEventListener('keydown', handleModifyLine);  
@@ -978,11 +1060,6 @@ export class View{
                             
                 
                             posId.addEventListener('dblclick', dblclickEvent);
-
-
-
-
-                            
                         }
                     }
                 }
@@ -990,9 +1067,6 @@ export class View{
             }
             else{
                 middleSelector.appendChild(createLi);
-
-               
-
             }
 
         }
@@ -1008,10 +1082,9 @@ export class View{
            
             let createLi = [];
 
-           
-           
 
             // Drag and drop 
+
             function dragStartHandler(e){
 
                 for(let i=0; i<(posIndex-1)*2+1; i++){
@@ -1023,18 +1096,13 @@ export class View{
                     }
                     
                 }
-                console.log('e.target.id');
-                console.log(e.target.id);
                 e.dataTransfer.setData("text/plain", e.target.id);
             }
 
             for(let i=1; i<=(posIndex-1); i++){
                 posId[i] = document.getElementById('pos_' + i);
                 posId[i].addEventListener('dragstart', dragStartHandler);
-     
-    
             }
-
 
             function dragOverHandler(e){
                 e.preventDefault();
@@ -1043,14 +1111,8 @@ export class View{
 
             function dropHandler(e){
                 e.preventDefault();
-                console.log('e.dataTransfer');
-                console.log(e.dataTransfer);
                 let pos = e.dataTransfer.getData("text/plain");
                 let target = e.target.id;
-                console.log('e.target.id')
-                console.log(e.target.id)
-                console.log('pos');
-                console.log(pos);
                 Private.dragAndDrop(pos, target, pageClicked);
             }
             
@@ -1066,11 +1128,6 @@ export class View{
             // Ajout bouton + 
 
             addPlus('add');
-
-
-
-            
-
         }
 
 
@@ -1092,8 +1149,6 @@ export class View{
         else{
             document.querySelector(`.${zone}__content__right`).innerHTML = 'Ajouter un titre créera un sommaire';
         }
-        
-
     }
 
 
