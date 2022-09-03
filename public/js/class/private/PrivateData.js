@@ -40,17 +40,47 @@ export class PrivateData{
     }
 
 
-    outsideLoad = async () => {
+    outsideLoad = async (oneNote) => {
         // Charge les notes, les pages =f(username)
         let outsideContent = await Fetch.jsonFetchGET('Private/outside');
         this.outsideContent = outsideContent;
-        View.outsideView(outsideContent, 'Private');
+
+        console.log('oneNote avant :');
+        console.log(oneNote);
+        if(oneNote != undefined){
+            console.log('here');
+            for(let oc of outsideContent){
+                console.log(oneNote);
+                console.log(oc);
+                if(oneNote.note_id === oc.note_id){
+                    oneNote.share = oc.share;
+                    oneNote.note_name = oc.note_name;
+                }
+            }
+        }
+        console.log('oneNote après :');
+        console.log(oneNote);
+        
+
+        console.log('outsideContent :');
+        console.log(outsideContent);
+        View.outsideView(outsideContent, 'Private', oneNote);
       
     }
+
+    insideLoad = async (pageClicked, zone) => {
+
+        let fetchOptions = {method:'POST', header:{'Content-Type':'application/json'}, body :pageClicked}
+        let insideContent = await Fetch.jsonFetchPOST(`${zone}/inside`, fetchOptions)
+        Private.insideContent = await insideContent;
+        View.insideView(insideContent, pageClicked, zone);
+    }
+    
 
 
 
     modification = async (returnObject, content_id, pageClicked)  => {
+
 
         let newInsideContent = [];
 
@@ -106,7 +136,7 @@ export class PrivateData{
         body : insideContentToUpdate}; 
             
         Fetch.jsonFetchPOST('Private/update',fetchOptions)
-        .then(View.insideView(newInsideContent[this.nbOfInstance].insideContent, pageClicked,'Private'))
+        .then(Private.insideLoad(pageClicked, 'Private'))
 
     }
 
@@ -135,11 +165,7 @@ export class PrivateData{
         let resp = await Fetch.jsonFetchPOST('Private/notePageUpdate',fetchOptions);
         let outsideContent = await Fetch.jsonFetchGET('Private/outside');
         this.outsideContent = outsideContent;
-        View.outsideView(outsideContent, 'Private');
-        
-
-
-
+        Private.outsideLoad();
     }
 
 
@@ -177,17 +203,17 @@ export class PrivateData{
 
         let iCLength = newInsideContent[this.nbOfInstance].insideContent.length;
 
-        let indexOfLastInsideContent;
+        
         let lastInsideContent;
         for(let i=0; i<iCLength; i++){
-            if(i===1 && indexOfLastInsideContent>= 1){
-                if(newInsideContent[this.nbOfInstance].insideContent[i].position > newInsideContent[this.nbOfInstance].insideContent[i-1].position)
-                lastInsideContent = newInsideContent[this.nbOfInstance].insideContent[i].position;
-                indexOfLastInsideContent = i;
+            if(i >= 1){
+                console.log(newInsideContent[this.nbOfInstance].insideContent[i].position);
+                console.log(lastInsideContent.position);
+                if(newInsideContent[this.nbOfInstance].insideContent[i].position > lastInsideContent.position)
+                lastInsideContent = newInsideContent[this.nbOfInstance].insideContent[i];
             }else
             {
                 lastInsideContent = newInsideContent[this.nbOfInstance].insideContent[i]
-                indexOfLastInsideContent = i;
             }
         }
 
@@ -233,7 +259,7 @@ export class PrivateData{
         Private.insideContent = await insideContent;
 
 
-        View.insideView(insideContent, pageClicked, 'Private');
+        Private.insideLoad(pageClicked, 'Private')
 
     }
 
@@ -263,7 +289,13 @@ export class PrivateData{
         let resp = await Fetch.jsonFetchPOST('Private/notePageAdd',fetchOptions);
         let outsideContent = await Fetch.jsonFetchGET('Private/outside');
         this.outsideContent = outsideContent;
-        View.outsideView(outsideContent, 'Private');
+        if(type ==='note'){
+            Private.outsideLoad();
+        }
+        else if(type ==='page'){
+            Private.outsideLoad(oneNote);
+        }
+        
         
 
     }
@@ -330,13 +362,13 @@ export class PrivateData{
 
 
         Fetch.jsonFetchPOST('Private/deleteUpdate',fetchUpdateOptions)
-        .then(View.insideView(newInsideContent[this.nbOfInstance].insideContent, pageClicked,'Private'))
+        .then(Private.insideLoad(pageClicked, 'Private'))
 
 
         // Appelle de la vue
     }
 
-    deletePageNote(type ,oneNote){
+    async deletePageNote(type ,oneNote){
         //
         let toFetch = {};
         if(type === 'note'){
@@ -356,11 +388,14 @@ export class PrivateData{
         let fetchUpdateOptions = {method:'POST', headers:{'Content-Type':'application/json;charset=utf-8', 'Accept':'application/json'}, body: toFetch}
 
 
-        Fetch.jsonFetchPOST('Private/deletePageNote',fetchUpdateOptions)
-        .then(Private.outsideLoad())
-
-
-        // Appelle de la vue
+        await Fetch.jsonFetchPOST('Private/deletePageNote',fetchUpdateOptions)
+        if(type === 'note'){
+            Private.outsideLoad();
+        }
+        else if(type === 'page'){
+            Private.outsideLoad(oneNote);
+        }
+    
     }
 
     dragAndDrop(pos ,target, pageClicked){
@@ -452,104 +487,12 @@ export class PrivateData{
         }
         
        
-
-        console.log('insideContentToUpdate :');
-        console.log(insideContentToUpdate);
-
-
-
-
-       /*
-        if(newPos < pos){
-
-            for(let j = newPos; j < pos; j++){  
-
-                console.log('un');
-
-                for(let i = 0; i < newInsideContent[this.nbOfInstance].insideContent.length; i++){
-                    console.log('deux :');
-                    if(newInsideContent[this.nbOfInstance].insideContent[i].page_id === pageClicked){
-                        console.log('troiq :');
-                        if(newInsideContent[this.nbOfInstance].insideContent[i].position === pos){
-                            console.log('quatres :');
-                            newInsideContent[this.nbOfInstance].insideContent[i].position = -1;
-                        }
-                    }
-                } 
-                
-                for(let i = 0; i < newInsideContent[this.nbOfInstance].insideContent.length; i++){
-                    if(newInsideContent[this.nbOfInstance].insideContent[i].page_id === pageClicked){
-                        if(newInsideContent[this.nbOfInstance].insideContent[i].position === j){
-                            console.log('j :');
-                            console.log(j);
-                            console.log('newInsideContent[this.nbOfInstance].insideContent[i].position :');
-                            console.log(newInsideContent[this.nbOfInstance].insideContent[i].position);
-                            console.log('(newInsideContent[this.nbOfInstance].insideContent[i].position)+1');
-                            console.log((newInsideContent[this.nbOfInstance].insideContent[i].position)+1);
-                            newInsideContent[this.nbOfInstance].insideContent[i].position = (newInsideContent[this.nbOfInstance].insideContent[i].position)+1;
-                            insideContentToUpdate.push(newInsideContent[this.nbOfInstance].insideContent[i]);
-                            console.log('insideContentToUpdate :');
-                            console.log(insideContentToUpdate);
-                        }
-                    }
-                }
-
-                for(let i = 0; i < newInsideContent[this.nbOfInstance].insideContent.length; i++){
-                    if(newInsideContent[this.nbOfInstance].insideContent[i].page_id === pageClicked){
-                        if(newInsideContent[this.nbOfInstance].insideContent[i].position === -1){
-                            newInsideContent[this.nbOfInstance].insideContent[i].position = newPos;
-                            insideContentToUpdate.push(newInsideContent[this.nbOfInstance].insideContent[i]);
-                        }
-                    }
-                }    
-            }
-        }
-        else if(newPos > pos){
-
-            for(let j = pos+1; j <= newPos; j++){  
-
-                //On attribue pos = -1 à l'élément dragged. Pour ne pas le prendre avec le nouveau qui prend sa pos ci-dessous
-                for(let i = 0; i < newInsideContent[this.nbOfInstance].insideContent.length; i++){
-                    if(newInsideContent[this.nbOfInstance].insideContent[i].page_id === pageClicked){
-                        if(newInsideContent[this.nbOfInstance].insideContent[i].position === pos){
-                            newInsideContent[this.nbOfInstance].insideContent[i].position = -1;
-                        }
-                    }
-                } 
-                  
-                // On redescend tout le monde (compris entre 2 pos cibles) d'une pos
-                for(let i = 0; i < newInsideContent[this.nbOfInstance].insideContent.length; i++){
-                    if(newInsideContent[this.nbOfInstance].insideContent[i].page_id === pageClicked){
-                        if(newInsideContent[this.nbOfInstance].insideContent[i].position === j){
-                            newInsideContent[this.nbOfInstance].insideContent[i].position = (newInsideContent[this.nbOfInstance].insideContent[i].position)-1;
-                            insideContentToUpdate.push(newInsideContent[this.nbOfInstance].insideContent[i]);
-                        }
-                    }
-                }
-
-                // On donne la bonne pos à l'élément dépacé
-                for(let i = 0; i < newInsideContent[this.nbOfInstance].insideContent.length; i++){
-                    if(newInsideContent[this.nbOfInstance].insideContent[i].page_id === pageClicked){
-                        if(newInsideContent[this.nbOfInstance].insideContent[i].position === -1){
-                            newInsideContent[this.nbOfInstance].insideContent[i].position = newPos;
-                            insideContentToUpdate.push(newInsideContent[this.nbOfInstance].insideContent[i]);
-                        }
-                    }
-                }
-                    
-            }
-        }
-        else{
-            View.insideView(this.insideContent, pageClicked, 'Private');
-        }
-*/
+      
         this.insideContent = newInsideContent[this.nbOfInstance].insideContent;
         insideContentToUpdate = newInsideContent[this.nbOfInstance].insideContent
 
         // maj db
 
-        console.log('insideContentToUpdate :');
-        console.log(insideContentToUpdate);
 
         insideContentToUpdate = JSON.stringify(insideContentToUpdate);
 
@@ -558,11 +501,7 @@ export class PrivateData{
         body : insideContentToUpdate}; 
             
         Fetch.jsonFetchPOST('Private/update',fetchOptions)
-        .then(View.insideView(newInsideContent[this.nbOfInstance].insideContent, pageClicked,'Private'))
-        
-
-       
-
+        .then(Private.insideLoad(pageClicked, 'Private'))
 
     }
 

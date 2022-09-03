@@ -33,7 +33,7 @@ if($json[1]['type'] === 'note'){
     $query = 'SELECT page_id FROM page ORDER BY page_id DESC';
     $page_id = Db::fetch($query, 'Page');
 
-    $query = "INSERT INTO content (page_id, position, type, content) VALUES ('" . $page_id->page_id ."', '1', 'p', 'Nouvelle page - faites un double clic pour modifier ce texte. Ajouter un titre, du texte ou du code avec + . Vous pouvez ensuite déplacer les blocs de contenu si besoin')"; 
+    $query = "INSERT INTO content (page_id, position, type, content) VALUES ('" . $page_id->page_id ."', '1', 'p', 'Nouvelle page - faites un double clic pour modifier ce texte. Ajouter un titre, du texte ou du code avec + . Vous pouvez ensuite déplacer les blocs de contenu si besoin.')"; 
 
     $statement = Db::$pdo->prepare($query);
     $statement->execute(); 

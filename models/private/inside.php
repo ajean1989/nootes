@@ -13,6 +13,12 @@ $query = 'SELECT note.note_id, note.note_name, note.share, page.page_id, page.pa
 
 $insideContent = Db::fetchall($query, 'Content');
 
+
+for($i=0; $i<count($insideContent); $i++){
+    $insideContent[$i]->content = htmlspecialchars_decode($insideContent[$i]->content);  
+}
+
+
 $insideContent = json_encode($insideContent);
 
 

@@ -11,10 +11,10 @@ Db::Connexion();
 
 for($i=0; $i<count($json); $i++){
     $query = 'UPDATE content SET 
-            content.position = \'' .  $json[$i]['position'] . '\',
-            content.type = \'' . $json[$i]['type'] . '\',
-            content.content= \'' . $json[$i]['content'] . '\'
-            WHERE content.content_id = \'' . $json[$i]['content_id'] . '\''; 
+            position = \'' .  $json[$i]['position'] . '\',
+            type = \'' . $json[$i]['type'] . '\',
+            content= \'' . htmlspecialchars($json[$i]['content']) . '\'
+            WHERE content_id = \'' . $json[$i]['content_id'] . '\''; 
 
     $statement = Db::$pdo->prepare($query);
     $statement->execute(); 

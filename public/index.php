@@ -83,9 +83,13 @@ if(preg_match($regex,$uri))
         case '/fetch/Private/modifyPassword':
             require_once $controlsDirectory . 'private'. DIRECTORY_SEPARATOR .'modifyPassword.php';
             break;
+        case '/fetch/Private/modifyShare':
+            require_once $controlsDirectory . 'private'. DIRECTORY_SEPARATOR .'modifyShare.php';
+            break;
         case '/fetch/Private/disconnect':
             require_once $controlsDirectory . 'private'. DIRECTORY_SEPARATOR .'disconnect.php';
             break;
+            
             
        
             

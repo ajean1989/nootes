@@ -241,7 +241,7 @@ export class View{
 
         function closeHandler(e){
             e.preventDefault();
-            
+
             passForm.removeEventListener('submit', modifyPassHandler);
             deleteUserBtn.removeEventListener('click', deleteUserHandler);
             closeModal.removeEventListener('click', closeHandler);
@@ -312,8 +312,10 @@ export class View{
 
 
 
-    static async outsideView(outside,zone){
+    static async outsideView(outside,zone,oneNote){  //LastState = last note clicked
 
+        console.log('oneNote début outsideView:');
+        console.log(oneNote);
 
         // Affiche h3 nom -> li notes
             //onclick h3 nom + note -> li pages
@@ -330,6 +332,14 @@ export class View{
 
         if(zone === 'Private')
         {
+
+            let toggle = document.getElementById('toggle');
+
+            while (toggle.firstChild) {
+                toggle.removeChild(toggle.firstChild);
+            }
+
+
             lefth3Selector.textContent = Private.username;
             lefth3Selector.addEventListener('click', (e) => {
                 e.preventDefault;
@@ -368,9 +378,7 @@ export class View{
                 middleSelector.removeChild(middleSelector.firstChild);
             }
             middleSelector.textContent = 'Sélectionnez une page';
-
-
-
+        
 
             // h4 + onclick
 
@@ -383,26 +391,89 @@ export class View{
                 lefth4Selector.textContent = oneNote.note_name;
 
 
-                let outsideClichandler = (e) => {
-                    e.preventDefault; 
-                    lefth4Selector.removeEventListener('click', outsideClichandler);
+                let outsideClickHandler = (e) => {
+                    e.preventDefault(); 
+                    lefth4Selector.removeEventListener('click', outsideClickHandler);
                     lefth4Selector.textContent = '';
                     Public.publicStep1();
                 }
                 
-                lefth4Selector.addEventListener('click', outsideClichandler);
+                lefth4Selector.addEventListener('click', outsideClickHandler);
             }
             else{
                 lefth4Selector.textContent = oneNote.note_name;
 
-                let outsideClichandler = (e) => {
-                    e.preventDefault; 
-                    lefth4Selector.removeEventListener('click', outsideClichandler);
+                // Toggle switch share button
+
+                    // Le toggle
+
+                let toggle = document.getElementById('toggle');
+
+                while (toggle.firstChild) {
+                    toggle.removeChild(toggle.firstChild);
+                }
+                
+                let toggleSwitch = document.createElement('label');
+                toggleSwitch.className = 'switch';
+                let inputSwitch = document.createElement('input');
+                inputSwitch.type = 'checkbox';
+                let slider = document.createElement('span');
+                slider.className = 'slider round';
+
+                console.log('oneNote dans firstClic:');
+                console.log(oneNote);
+
+                if(oneNote.share === 1){
+                    inputSwitch.setAttribute('checked', true);
+                }
+                else{
+                 
+                }
+
+                toggleSwitch.appendChild(inputSwitch);
+                toggleSwitch.appendChild(slider);
+
+                toggle.appendChild(toggleSwitch);
+
+
+                    // Au clic
+
+                async function toggleHandler(e){
+                    e.preventDefault();
+                    let toFetch = {'share' : oneNote.share,'note_id': oneNote.note_id}
+                    console.log('toFetch :');
+                    console.log(toFetch);
+                    let fetchOptions = {
+                        method:'POST', 
+                        headers:{'Content-Type': 'application/json;charset=utf-8',
+                                'Accept': 'application/json'},
+                        body: JSON.stringify(toFetch)
+                    }
+                    let response = await Fetch.jsonFetchPOST('Private/modifyShare',fetchOptions);
+                    if(response === true){
+                        Public.publicStep1();
+                        Private.outsideLoad(oneNote);
+                    }
+                    
+                    
+
+                }
+
+                inputSwitch.addEventListener('change', toggleHandler);
+
+
+
+                
+                /////////////////
+
+                let outsideClickHandler = (e) => {
+                    e.preventDefault(); 
+                    lefth4Selector.removeEventListener('click', outsideClickHandler);
                     lefth4Selector.textContent = '';
                     this.outsideView(outside, zone);
                 }
 
-                lefth4Selector.addEventListener('click', outsideClichandler);
+                lefth4Selector.addEventListener('click', outsideClickHandler);
 
             }
 
@@ -518,10 +589,13 @@ export class View{
                             setTimeout(async ()=>
                             {
                                 if(nbOfClick === 1){
+                                    /*
                                     let fetchOptions = {method:'POST', header:{'Content-Type':'application/json'}, body : onePage.page_id}
                                     let insideContent = await Fetch.jsonFetchPOST(`${zone}/inside`, fetchOptions)
                                     Private.insideContent = await insideContent;
                                     this.insideView(insideContent, pageClicked[i], zone);
+                                    */
+                                   Private.insideLoad(pageClicked[i], zone);
                                 }
                                 else{
                                     if(zone === 'Private'){
@@ -703,6 +777,8 @@ export class View{
             addNote.addEventListener('click', clickAddHandler);
         }
 
+
+
            
         // Au clic sur la note
 
@@ -801,6 +877,13 @@ export class View{
             }
             elt.addEventListener('click', clickOpenEvent);
         }
+
+        // Si une note a déjà été cliqué 
+
+        if(typeof(oneNote) !== 'undefined'){
+            firstClick(oneNote, 'Private');
+        }
+
     }
 
 
@@ -938,6 +1021,7 @@ export class View{
 
         for(let i = 0; i <insideContent.length*2; i++){
 
+            
             let createLi = document.createElement('div');
             createLi.id = 'li_' + i;
             
@@ -965,7 +1049,6 @@ export class View{
 
                         
                         middleSelector.appendChild(createLi);
-                        //createLi.appendChild(createMove);
                         createLi.appendChild(createPos);
                         createPos.appendChild(createContent);
 
@@ -1066,7 +1149,7 @@ export class View{
                 posIndex++;
             }
             else{
-                middleSelector.appendChild(createLi);
+                    middleSelector.appendChild(createLi);
             }
 
         }
@@ -1089,7 +1172,7 @@ export class View{
 
                 for(let i=0; i<(posIndex-1)*2+1; i++){
                     if(i % 2 === 0){
-                        createLi[i] = document.getElementById('li_' + i);
+                        createLi[i] = document.querySelector('.Private__content__middle #li_' + i);
                         createLi[i].style.height = '5px';
                         createLi[i].style.background = '#FF922A';
                         createLi[i].style.opacity = '0.5';
@@ -1118,7 +1201,7 @@ export class View{
             
             for(let i=0; i<(posIndex-1)*2+1; i++){
                 if(i % 2 === 0){
-                    createLi[i] = document.getElementById('li_' + i);
+                    createLi[i] = document.querySelector('.Private__content__middle #li_' + i);
                     createLi[i].addEventListener('dragover',dragOverHandler);
                     createLi[i].addEventListener('drop',dropHandler);
                 }

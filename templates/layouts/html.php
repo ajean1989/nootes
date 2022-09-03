@@ -49,6 +49,7 @@
             <div class="Private__content__left">
                 <h3></h3>
                 <h4></h4>
+                <div id="toggle"></div>
                 <ul></ul>
             </div>
 

@@ -7,14 +7,14 @@ if(isset($_SESSION['username'])){
     $mail = $_SESSION['mail'];
 }
 else{
-    $username;
-    $mail;
+    $username ='';
+    $mail='';
 }
 
 echo '
 <dialog id="dialog__profil">
-    <p>username : '. $_SESSION['username'] . '</p>
-    <p>e-mail : '. $_SESSION['mail'] . '</p>
+    <p>username : '. $username . '</p>
+    <p>e-mail : '. $mail . '</p>
     <form id="form--modifyPass">
         <label for="password">Mot de passe</label> : <input type="password" name="password" id="password">
         <label for="newPassword">Nouveau mot de passe</label> : <input type="password" name="newPassword" id="newPassword">
