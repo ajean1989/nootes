@@ -45,25 +45,14 @@ export class PrivateData{
         let outsideContent = await Fetch.jsonFetchGET('Private/outside');
         this.outsideContent = outsideContent;
 
-        console.log('oneNote avant :');
-        console.log(oneNote);
         if(oneNote != undefined){
-            console.log('here');
             for(let oc of outsideContent){
-                console.log(oneNote);
-                console.log(oc);
                 if(oneNote.note_id === oc.note_id){
                     oneNote.share = oc.share;
                     oneNote.note_name = oc.note_name;
                 }
             }
         }
-        console.log('oneNote après :');
-        console.log(oneNote);
-        
-
-        console.log('outsideContent :');
-        console.log(outsideContent);
         View.outsideView(outsideContent, 'Private', oneNote);
       
     }
@@ -151,11 +140,6 @@ export class PrivateData{
             toFetch = [returnObject,{'page_id':oneOutside.page_id},{'type':type}];
         }
 
-
-        console.log(oneOutside);
-        console.log(toFetch);
-        
-
    
         toFetch = JSON.stringify(toFetch);
 
@@ -183,9 +167,6 @@ export class PrivateData{
 
         // Traite l'erreur si on souhaite ajouté un content si la page est vide
 
-        console.log('this.insideContent :');
-
-        console.log(this.insideContent);
 
         if(this.insideContent.length !== 0)
         {
@@ -195,8 +176,6 @@ export class PrivateData{
             newInsideContent[this.nbOfInstance].insideContent = [{content:'',type:'',position:0, page_id: pageClicked}];
         }
 
-        console.log('newInsideContent[this.nbOfInstance].insideContent :');
-        console.log(newInsideContent[this.nbOfInstance].insideContent);
 
 
         //Ajout d'un objet content dans insideContent en copiant le dernier et modifiant avec les données de returnObject
@@ -207,8 +186,6 @@ export class PrivateData{
         let lastInsideContent;
         for(let i=0; i<iCLength; i++){
             if(i >= 1){
-                console.log(newInsideContent[this.nbOfInstance].insideContent[i].position);
-                console.log(lastInsideContent.position);
                 if(newInsideContent[this.nbOfInstance].insideContent[i].position > lastInsideContent.position)
                 lastInsideContent = newInsideContent[this.nbOfInstance].insideContent[i];
             }else
@@ -217,18 +194,11 @@ export class PrivateData{
             }
         }
 
-        console.log('lastInsideContent');
-        console.log(lastInsideContent);
+       
 
         newInsideContent[this.nbOfInstance].insideContent.push(lastInsideContent);
 
-        console.log('newInsideContent[this.nbOfInstance].insideContent');
-        console.log(newInsideContent[this.nbOfInstance].insideContent);
-        console.log('newInsideContent[this.nbOfInstance].insideContent[(iCLength)]');
-        console.log(newInsideContent[this.nbOfInstance].insideContent[(iCLength)]);
-        console.log('iCLength');
-        console.log(iCLength);
-
+     
 
 
         newInsideContent[this.nbOfInstance].insideContent[(iCLength)].content = returnObject.content;
@@ -242,9 +212,6 @@ export class PrivateData{
 
         insideContentToAdd.push(JSON.stringify(newInsideContent[this.nbOfInstance].insideContent[(iCLength)]));
 
-        console.log('to fetch');
-        console.log(insideContentToAdd);
-        console.log(newInsideContent[this.nbOfInstance].insideContent[(iCLength)]);
 
 
         let fetchOptions1 = {method:'POST', headers:{'Content-Type' : 'application/json;charset=utf-8', 'Accept' : 'application/json'}, 
@@ -265,7 +232,6 @@ export class PrivateData{
 
     async addNotePage(returnObject, oneNote, type){
 
-        console.log(oneNote);
 
         let toFetch;
         if(type ==='note'){
@@ -277,9 +243,6 @@ export class PrivateData{
 
 
        
-        console.log(toFetch);
-        
-
    
         toFetch = JSON.stringify(toFetch);
 
@@ -345,9 +308,6 @@ export class PrivateData{
             }
         }
 
-        console.log('newInsideArray :');
-        console.log(newInsideArray);
-        
 
         newInsideContent[this.nbOfInstance].insideContent = newInsideArray;
 
@@ -378,7 +338,6 @@ export class PrivateData{
             toFetch.page_id = oneNote.page_id;
         }
 
-        console.log(toFetch);
 
         toFetch = JSON.stringify(toFetch);
 
@@ -447,26 +406,14 @@ export class PrivateData{
        //let insideContentToUpdate =[]
 
         // Remonter ou descendre toutes les positions qui sont entres les deux modifs
-        console.log('pos :');
-        console.log(pos);
-        console.log('newPos :');
-        console.log(newPos);
-        console.log('newInsideContent[this.nbOfInstance].insideContent: ');
-        console.log(newInsideContent[this.nbOfInstance].insideContent);
-
-        console.log('pageClicked :');
-        console.log(pageClicked);
 
         let insideContentToUpdate;
 
-        console.log('insideContentToUpdate :');
-        console.log(insideContentToUpdate);
 
 
         if(direction === 'down'){
             insideContentToUpdate = newInsideContent[this.nbOfInstance].insideContent.filter(toChange => toChange.page_id === pageClicked && toChange.position >= newPos && toChange.position <= pos);
             for(let content of insideContentToUpdate){
-                console.log(content);
                 content.position = (content.position)+1
                 if(content.position > pos)
                 {
@@ -477,7 +424,6 @@ export class PrivateData{
         if(direction === 'up'){
             insideContentToUpdate = newInsideContent[this.nbOfInstance].insideContent.filter(toChange => toChange.page_id === pageClicked && toChange.position >= pos && toChange.position <= newPos);
             for(let content of insideContentToUpdate){
-                console.log(content);
                 content.position = (content.position)-1
                 if(content.position < pos)
                 {

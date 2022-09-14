@@ -7,10 +7,12 @@ section{
     min-height : 400px;
 
 
+}
+
+.Private__content{
     display : flex;
     justify-content: space-around;
     align-items: stretch;
-
 }
 
 .Private__content__left{
@@ -29,6 +31,8 @@ section{
 
     margin-top: 10px;
     margin-bottom : 10px;
+
+    overflow-y : scroll;
 
 
 }

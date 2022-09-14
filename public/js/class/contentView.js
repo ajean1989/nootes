@@ -279,7 +279,6 @@ export class View{
             let fetchOptions = {method:'POST', body:newPassword};
 
             let response = await Fetch.jsonFetchPOST('Private/modifyPassword',fetchOptions);
-            console.log(response);
 
             if(response.valid === 1 ){
                 profilModal.close();
@@ -293,16 +292,6 @@ export class View{
 
         }
         passForm.addEventListener('submit', modifyPassHandler);
-
-
-
-
-
-
-
-    
-        
-
     
    
     }
@@ -314,8 +303,7 @@ export class View{
 
     static async outsideView(outside,zone,oneNote){  //LastState = last note clicked
 
-        console.log('oneNote début outsideView:');
-        console.log(oneNote);
+       
 
         // Affiche h3 nom -> li notes
             //onclick h3 nom + note -> li pages
@@ -420,8 +408,7 @@ export class View{
                 let slider = document.createElement('span');
                 slider.className = 'slider round';
 
-                console.log('oneNote dans firstClic:');
-                console.log(oneNote);
+            
 
                 if(oneNote.share === 1){
                     inputSwitch.setAttribute('checked', true);
@@ -440,9 +427,7 @@ export class View{
 
                 async function toggleHandler(e){
                     e.preventDefault();
-                    let toFetch = {'share' : oneNote.share,'note_id': oneNote.note_id}
-                    console.log('toFetch :');
-                    console.log(toFetch);
+                    let toFetch = {'share' : oneNote.share,'note_id': oneNote.note_id};
                     let fetchOptions = {
                         method:'POST', 
                         headers:{'Content-Type': 'application/json;charset=utf-8',
@@ -1262,7 +1247,7 @@ export class View{
         let titleIndex = 0;
 
         // Récupère les éléments où il y a un h dans une variable titre[]
-        for(let j=0; j<nb.length*2; j++){   //
+        for(let j=0; j<9999; j++){   //
             if(nb.indexOf(j) !== (-1)){     //   
                 if(document.getElementById('content_' + j).firstChild.nodeName=='#text'){   
                     titres[titleIndex]=document.getElementById('content_' + j);  
@@ -1307,65 +1292,147 @@ export class View{
             }
         }
 
-
         for(var i = 0; i<titres.length; i++){	// essayer avec switch  et créer une fonction string(n)
             let j=nb[i]
             if (typetitre[i]=='h1'){					// affiche titre1 (1, 2, ... ) devant + change le href
-                string += '<' + typetitre[i] + '><a href="#' + i + '">' + titre1 + '. ' + titres[i].innerHTML + '</' + typetitre[i] + '><br/>' ;
+                //string += '<' + typetitre[i] + '><a href="#' + i + '">' + titre1 + '. ' + titres[i].innerHTML + '</' + typetitre[i] + '><br/>' ;
+                string += '<' + typetitre[i] + '>' + titre1 + '. ' + titres[i].innerHTML + '</' + typetitre[i] + '><br/>' ;
                 document.getElementById('content_' + j).innerHTML = titre1 + '. ' + main_titres(i) ; 		//titres[i].parentNode.innerHTML ;
                 titre1++;
             } else if (typetitre[i]=='h2'){				// affiche titre2 (I, II, ... ) devant + change le href	
                 if(typetitre[i-1]=='h1'){				//permet de repartir à 0 si le chaptitre est clôt
                     local2=0;
-                    string += '<' + typetitre[i] + '><a href="#' + i + '">' + titre2[local2] + '. ' + titres[i].innerHTML + '</' + typetitre[i] + '><br/>' ;	
+                    //string += '<' + typetitre[i] + '><a href="#' + i + '">' + titre2[local2] + '. ' + titres[i].innerHTML + '</a></' + typetitre[i] + '><br/>' ;	
+                    string += '<' + typetitre[i] + '>' + titre2[local2] + '. ' + titres[i].innerHTML + '</' + typetitre[i] + '><br/>' ;
                     document.getElementById('content_' + j).innerHTML = titre2[local2] + '. ' +main_titres(i) ;	
                     local2++;
                 }else{									// incrémente titre2 et affiche les titres
-                string += '<' + typetitre[i] + '><a href="#' + i + '">' + titre2[local2] + '. ' + titres[i].innerHTML + '</' + typetitre[i] + '><br/>' ;
+                //string += '<' + typetitre[i] + '><a href="#' + i + '">' + titre2[local2] + '. ' + titres[i].innerHTML + '</a></' + typetitre[i] + '><br/>' ;
+                string += '<' + typetitre[i] + '>' + titre2[local2] + '. ' + titres[i].innerHTML + '</' + typetitre[i] + '><br/>' ;
                 document.getElementById('content_' + j).innerHTML = titre2[local2] + '. ' + main_titres(i) ;		
                 local2++;
                 }
             } else if (typetitre[i]=='h3'){
                 if(typetitre[i-1]=='h1'|| typetitre[i-1]=='h2' ){
                     local3=0;
-                    string += '<' + typetitre[i] + '><a href="#' + i + '">' + titre3[local3] + '. ' + titres[i].innerHTML + '</' + typetitre[i] + '><br/>' ;
+                    //string += '<' + typetitre[i] + '><a href="#' + i + '">' + titre3[local3] + '. ' + titres[i].innerHTML + '</a></' + typetitre[i] + '><br/>' ;
+                    string += '<' + typetitre[i] + '>' + titre3[local3] + '. ' + titres[i].innerHTML + '</' + typetitre[i] + '><br/>' ;
                     document.getElementById('content_' + j).innerHTML = titre3[local3] + '. ' + main_titres(i) ;	
                     local3++;
                 }else{
-                string += '<' + typetitre[i] + '><a href="#' + i + '">' + titre3[local3] + '. ' + titres[i].innerHTML + '</' + typetitre[i] + '><br/>' ;
+                //string += '<' + typetitre[i] + '><a href="#' + i + '">' + titre3[local3] + '. ' + titres[i].innerHTML + '</a></' + typetitre[i] + '><br/>' ;
+                string += '<' + typetitre[i] + '>' + titre3[local3] + '. ' + titres[i].innerHTML + '</' + typetitre[i] + '><br/>' ;
                 document.getElementById('content_' + j).innerHTML = titre3[local3] + '. ' + main_titres(i) ;	
                 local3++;
                 }
             } else if (typetitre[i]=='h4'){
                 if(typetitre[i-1]=='h1'|| typetitre[i-1]=='h2'|| typetitre[i-1]=='h3'){
                     local4=0;
-                    string += '<' + typetitre[i] + '><a href="#' + i + '">' + titre4[local4] + '. ' + titres[i].innerHTML + '</' + typetitre[i] + '><br/>' ;
+                    //string += '<' + typetitre[i] + '><a href="#' + i + '">' + titre4[local4] + '. ' + titres[i].innerHTML + '</a></' + typetitre[i] + '><br/>' ;
+                    string += '<' + typetitre[i] + '>' + titre4[local4] + '. ' + titres[i].innerHTML + '</' + typetitre[i] + '><br/>' ;
                     document.getElementById('content_' + j).innerHTML = titre4[local4] + '. ' + main_titres(i) ;	
                     local4++;
                 }else{
-                string += '<' + typetitre[i] + '><a href="#' + i + '">' + titre4[local4] + '. ' + titres[i].innerHTML + '</' + typetitre[i] + '><br/>' ;
+                //string += '<' + typetitre[i] + '><a href="#' + i + '">' + titre4[local4] + '. ' + titres[i].innerHTML + '</a></' + typetitre[i] + '><br/>' ;
+                string += '<' + typetitre[i] + '>' + titre4[local4] + '. ' + titres[i].innerHTML + '</' + typetitre[i] + '><br/>' ;
                 document.getElementById('content_' + j).innerHTML = titre4[local4] + '. ' + main_titres(i) ;	
                 local4++;
                 }
             } else if (typetitre[i]=='h5'){
                 if(typetitre[i-1]=='h1'|| typetitre[i-1]=='h2'|| typetitre[i-1]=='h3'|| typetitre[i-1]=='h4'){
                     local5=0;
-                    string += '<' + typetitre[i] + '><a href="#' + i + '">' + titre5[local5] + '. ' + titres[i].innerHTML + '</' + typetitre[i] + '><br/>' ;
+                    //string += '<' + typetitre[i] + '><a href="#' + i + '">' + titre5[local5] + '. ' + titres[i].innerHTML + '</a></' + typetitre[i] + '><br/>' ;
+                    string += '<' + typetitre[i] + '>' + titre5[local5] + '. ' + titres[i].innerHTML + '</' + typetitre[i] + '><br/>' ;
                     document.getElementById('content_' + j).innerHTML = titre5[local5] + '. ' + main_titres(i) ;
                     local5++;
                 }else{
-                string += '<' + typetitre[i] + '><a href="#' + i + '">' + titre5[local5] + '. ' + titres[i].innerHTML + '</' + typetitre[i] + '><br/>' ;
+                //string += '<' + typetitre[i] + '><a href="#' + i + '">' + titre5[local5] + '. ' + titres[i].innerHTML + '</a></' + typetitre[i] + '><br/>' ;
+                string += '<' + typetitre[i] + '>' + titre5[local5] + '. ' + titres[i].innerHTML + '</' + typetitre[i] + '><br/>' ;
                 document.getElementById('content_' + j).innerHTML = titre5[local5] + '. ' + main_titres(i) ;
                 local5++;
                 }
             }else {
-            string += '<' + typetitre[i] + '><a href="#' + i + '">' + '?' + titres[i].innerHTML + '</' + typetitre[i] + '><br/>' ;
+            //string += '<' + typetitre[i] + '><a href="#' + i + '">' + '?' + titres[i].innerHTML + '</a></' + typetitre[i] + '><br/>' ;
+            string += '<' + typetitre[i] + '>' + '?' + titres[i].innerHTML + '</' + typetitre[i] + '><br/>' ;
             document.getElementById('content_' + j).innerHTML =  '?. ' + main_titres(i) ;
             }
         }
 
-
         document.querySelector(`.${zone}__content__right`).innerHTML = string; // Affiche le menu navright en HTML à l'emplacement id="navright"
 
     }
+
+
+
+    static state(){
+        let state = 'Public';
+
+        let stateArrow = document.querySelector('.Public__fold__arrow');
+
+        function stateView(){
+            if(state === 'Public'){
+                let publicElt = document.querySelector('.Public');
+                let publicContentElt = document.querySelector('.Public__content');
+                let privateContentElt = document.querySelector('.Private__content');
+
+                publicContentElt.style.visibility = 'visible';
+                publicElt.style.position = 'sticky';
+                publicElt.style.top = '0';
+                //publicElt.style.height = '90vh';
+
+                privateContentElt.style.visibility = 'collapse';
+
+                let privateElt = document.querySelector('section');
+                privateElt.style.position = 'static';
+                privateElt.style.height = '20vh';
+
+                let foldArrowElt = document.querySelector('.Public__fold__arrow');
+                foldArrowElt.style.clipPath = 'polygon(50% 0%, 100% 100%, 0% 100%)';
+
+                let publicFoldElt = document.querySelector('.Public__fold');
+                publicFoldElt.style.position = 'absolute';
+                publicFoldElt.style.bottom = '0';
+             
+            }
+            else{
+                let publicElt = document.querySelector('.Public');
+                let publicContentElt = document.querySelector('.Public__content');
+                let privateContentElt = document.querySelector('.Private__content');
+
+                publicContentElt.style.visibility = 'collapse';
+                publicElt.style.position = 'static';
+
+                privateContentElt.style.visibility = 'visible';
+
+                let privateElt = document.querySelector('section');
+                privateElt.style.position = 'sticky';
+                privateElt.style.top = '0';
+                privateElt.style.height = '70vh';
+
+                let foldArrowElt = document.querySelector('.Public__fold__arrow');
+                foldArrowElt.style.clipPath = 'polygon(0% 0%, 100% 0%, 50% 100%)';
+
+                let publicFoldElt = document.querySelector('.Public__fold');
+                publicFoldElt.style.position = 'static';
+            }
+        }
+
+        stateView();
+        
+        stateArrow.addEventListener('click', ()=>{
+            if(state === 'Public'){
+                state = 'Private'
+            }
+            else{
+                state = 'Public'
+            }
+ 
+            stateView();
+
+
+        })
+
+    }
 }
+
+

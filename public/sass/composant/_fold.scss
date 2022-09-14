@@ -1,0 +1,22 @@
+.Public__fold{
+    height : 11px;
+    width : 100%;
+
+    position : absolute;
+    bottom: 0;
+    
+    background: $sec-primary-color;
+
+    &__arrow{
+        background: $primary-color;
+
+        margin : auto;
+        margin-top : 2px;
+
+        height : 7px;
+        width : 12px;
+
+        clip-path: polygon(0% 0%, 100% 0%, 50% 100%);
+    }
+}
+

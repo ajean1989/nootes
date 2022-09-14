@@ -23,6 +23,8 @@
         display : flex;
         justify-content: space-between;
 
+        overflow-y : scroll;
+
         & ul{
             list-style-type : none;
             
